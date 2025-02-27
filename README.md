@@ -5,7 +5,7 @@ pre-alpha 0.0.1
 *(name still in progress - might be changed haha)*
 
 ## Welcome to MQForge!
-A tool for compiling MetaQuotes files from the commandline easier!
+A tool for making compiling MetaQuotes files from the commandline using the MetaQuotes compiler 'metaeditor.exe' easier!
 
 Further info TBD...
 
