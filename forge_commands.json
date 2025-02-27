@@ -1,0 +1,9 @@
+{
+	"market_platform" : "MetaTrader 4 IC Markets",
+	"meta_editor" : "/home/ao/.wine/drive_c/Program Files (x86)/MetaTrader 4 IC Markets/metaeditor.exe",
+	"default_header_location" : "C:/users/ao/AppData/Roaming/MetaQuotes/Terminal/1DAFD9A7C67DC84FE37EAA1FC1E5CF75/MQL4/Include/",
+	"use_wine" : true,
+	"compiler_colours" : true,
+	"suppress_errors" : true,
+	"use_PATH" : false
+}
