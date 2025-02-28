@@ -25,7 +25,7 @@ Yep, as simple as that!
 Further functionality does exist, however, and it can be seen through the help file, which is invoked with the `--help` flag, which is also shown here:
 ```
 -h/--help               -   print this helpfile
--me/--meta-editor       -   Location for your metaeditor.exe file if you are storing somewhere other than default.
+-me/--meta-editor       -   REQUIRED: Location for your metaeditor.exe file.
 -dh/--default-headers   -   Location directory of standard .mqh header files (this is usually something like 'C:/users/USERNAME/AppData/Roaming/MetaQuotes/Terminal/USERID/MQL4/Include/').
 -wine/--use-wine        -   Whether to use Wine to run 'metaeditor.exe' - only available on Linux.
 -clr/--colourful        -   Whether to provide a coloured output.
@@ -34,15 +34,15 @@ Further functionality does exist, however, and it can be seen through the help f
 -s/--alt-settings       -   Alternate settings file as opposed to the default 'forge_commands.json' file.
 ```
 
-if you want to make compiling easier if you're going to be compiling over and over, you can define a `forge_commands.json` file in the root of your project. This file gives you all the same options that the flags do; here is an example file:
+if you want to make compiling easier if you're going to be compiling over and over, you can define a `forge_commands.json` file in the root of your project. This file gives you all the same options that the flags do; here is an example file with the default values:
 ```json
 {
 	"meta_editor" : "/path/to/metaeditor.exe",
 	"default_header_location" : "path/to/MQL4/Include/",
-	"use_wine" : true,
+	"use_wine" : false,
 	"compiler_colours" : true,
-	"suppress_errors" : true,
-	"use_path" : false
+	"suppress_errors" : false,
+	"use_path" : true
 }
 ```
 
