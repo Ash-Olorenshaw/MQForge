@@ -1,8 +1,8 @@
 {
-	"meta_editor" : "/home/USER/.wine/drive_c/Program Files (x86)/MetaTrader 4 IC Markets/metaeditor.exe",
+	"meta_editor" : "/home/USER/.wine/drive_c/Program Files (x86)/TRADINGPLATFORM/metaeditor.exe",
 	"default_header_location" : "C:/users/USER/AppData/Roaming/MetaQuotes/Terminal/USERID/MQL4/Include/",
 	"use_wine" : true,
 	"compiler_colours" : true,
 	"suppress_errors" : true,
-	"use_PATH" : false
+	"use_path" : false
 }
