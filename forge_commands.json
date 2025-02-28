@@ -1,8 +1,8 @@
 {
 	"meta_editor" : "/path/to/metaeditor.exe",
 	"default_header_location" : "/path/to/MQL4/Include/",
-	"use_wine" : true,
+	"use_wine" : false,
 	"compiler_colours" : true,
-	"suppress_errors" : true,
-	"use_path" : false
+	"suppress_errors" : false,
+	"use_path" : true
 }
