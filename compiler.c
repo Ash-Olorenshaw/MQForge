@@ -279,10 +279,11 @@ int compile_file(char target_file[MAX_TOKEN_SIZE]) {
 	return 200;
 }
 
-int compile_files(char target_files[MAX_ARRAY_SIZE][MAX_TOKEN_SIZE], int file_num) {
+void compile_files(char target_files[MAX_ARRAY_SIZE][MAX_TOKEN_SIZE], int file_num) {
+	int success;
 	for (int i = 0; i < file_num; i++) {
-		compile_file(target_files[i]);
+		success = compile_file(target_files[i]);
+		if (success == 400)
+			return;
 	}
-
-	return 0;
 }

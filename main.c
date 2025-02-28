@@ -10,7 +10,7 @@
 #include "file_orderer.h"
 #include "compiler.h"
 
-#define HELP_STRING "MQForge v0.0.1\n\nAll flags optional.\n\n-h/--help\t\t-\tprint this helpfile\n-plat/--market_platform\t-\tYour MT4 platform of choice as it is stored in 'C:\\Program Files (x86)' (i.e. 'MetaTrader 4 IC Markets').\n-me/--meta-editor\t-\tLocation for your metaeditor.exe file if you are storing it in a special place.\n-dh/--default-headers\t-\tLocation directory of standard .mqh header files.\n-wine/--use-wine\t-\tWhether to use Wine to run 'metaeditor.exe' - only available on Linux.\n-clr/--colourful\t-\tWhether to provide a coloured output.\n-se/--suppress-errors\t-\tWhether to suppress launch errors for metaeditor.exe (really only matters with Wine).\n-path/--use-path\t-\tWhether to search your PATH for .ex4, .dll, and .mqh files.\n-s/--alt-settings\t-\tAlternate settings file as opposed to the default 'compiler_commands.json' file.\n\n"
+#define HELP_STRING "MQForge v0.0.1\n\nAll flags optional.\n\n-h/--help\t\t-\tprint this helpfile\n-me/--meta-editor\t-\tLocation for your metaeditor.exe file if you are storing it in a special place.\n-dh/--default-headers\t-\tLocation directory of standard .mqh header files.\n-wine/--use-wine\t-\tWhether to use Wine to run 'metaeditor.exe' - only available on Linux.\n-clr/--colourful\t-\tWhether to provide a coloured output.\n-se/--suppress-errors\t-\tWhether to suppress launch errors for metaeditor.exe (really only matters with Wine).\n-path/--use-path\t-\tWhether to search your PATH for .ex4, .dll, and .mqh files.\n-s/--alt-settings\t-\tAlternate settings file as opposed to the default 'compiler_commands.json' file.\n\n"
 
 int main(int argc, char *argv[]) {
 
@@ -19,9 +19,6 @@ int main(int argc, char *argv[]) {
 			printf(HELP_STRING);
 			return 0;
 		}
-
-		else if (check_arg_equals(argv[i], "-plat", "--market-platform", NULL))
-			market_platform = argv[i + 1];
 
 		else if (check_arg_equals(argv[i], "-me", "--meta-editor", NULL))
 			meta_editor = argv[i + 1];
@@ -86,12 +83,7 @@ int main(int argc, char *argv[]) {
 	read_basic_json(alt_settings_file, &json_size, &json);
 	for (int i = 0; i < json_size; i++) {
 		char *key = json[i].key;
-		if (strcmp("market_platform", key) == 0) {
-			if (string_to_bool(json[i].val) < 0) {
-				extract_delimited_string(market_platform = json[i].val, '"');
-			}
-		}
-		else if (strcmp("meta_editor", key) == 0) {
+		if (strcmp("meta_editor", key) == 0) {
 			if (string_to_bool(json[i].val) < 0) {
 				extract_delimited_string(meta_editor = json[i].val, '"');
 			}
@@ -123,8 +115,12 @@ int main(int argc, char *argv[]) {
 		}
 	}
 
+	if (meta_editor == NULL || strcmp(meta_editor, "") == 0) {
+		printf("Err - you must include a 'metaeditor.exe' location to compile. Either use flags -me/--meta-editor or key 'meta_editor' in forge_commands.json");
+		return 0;
+	}
+
 	printf("Starting compile with:\n");
-	printf("\t- market_platform = '%s'\n", market_platform);
 	printf("\t- meta_editor = '%s'\n", meta_editor);
 	printf("\t- default_header_location = '%s'\n", default_header_location);
 	printf("\t- use_wine = %s\n", use_wine ? "true" : "false");
