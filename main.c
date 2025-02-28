@@ -10,7 +10,7 @@
 #include "file_orderer.h"
 #include "compiler.h"
 
-#define HELP_STRING "MQForge v0.0.1\n\nAll flags optional.\n\n-h/--help\t\t-\tprint this helpfile\n-me/--meta-editor\t-\tREQUIRED: Location for your metaeditor.exe file\n-dh/--default-headers\t-\tLocation directory of standard .mqh header files.\n-wine/--use-wine\t-\tWhether to use Wine to run 'metaeditor.exe' - only available on Linux.\n-clr/--colourful\t-\tWhether to provide a coloured output.\n-se/--suppress-errors\t-\tWhether to suppress launch errors for metaeditor.exe (really only matters with Wine).\n-path/--use-path\t-\tWhether to search your PATH for .ex4, .dll, and .mqh files.\n-s/--alt-settings\t-\tAlternate settings file as opposed to the default 'compiler_commands.json' file.\n\n"
+#define HELP_STRING "MQForge v0.0.1\n\nAll flags optional.\n\n-h/--help\t\t-\tprint this helpfile\n-me/--meta-editor\t-\tREQUIRED: Location for your metaeditor.exe file\n-dh/--default-headers\t-\tLocation directory of standard .mqh header files.\n-wine/--use-wine\t-\tWhether to use Wine to run 'metaeditor.exe' - only available on Linux. (default: false)\n-clr/--colourful\t-\tWhether to provide a coloured output. (default: true)\n-se/--suppress-errors\t-\tWhether to suppress launch errors for metaeditor.exe (really only matters with Wine). (default: false)\n-path/--use-path\t-\tWhether to search your PATH for .ex4, .dll, and .mqh files. (default: true)\n-s/--alt-settings\t-\tAlternate settings file as opposed to the default 'compiler_commands.json' file.\n\n"
 
 int main(int argc, char *argv[]) {
 

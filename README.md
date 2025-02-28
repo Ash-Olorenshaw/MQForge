@@ -27,10 +27,10 @@ Further functionality does exist, however, and it can be seen through the help f
 -h/--help               -   print this helpfile
 -me/--meta-editor       -   REQUIRED: Location for your metaeditor.exe file.
 -dh/--default-headers   -   Location directory of standard .mqh header files (this is usually something like 'C:/users/USERNAME/AppData/Roaming/MetaQuotes/Terminal/USERID/MQL4/Include/').
--wine/--use-wine        -   Whether to use Wine to run 'metaeditor.exe' - only available on Linux.
--clr/--colourful        -   Whether to provide a coloured output.
--se/--suppress-errors   -   Whether to suppress launch errors for metaeditor.exe (really only matters with Wine).
--path/--use-path        -   Whether to search your PATH for .ex4, .dll, and .mqh files.
+-wine/--use-wine        -   Whether to use Wine to run 'metaeditor.exe' - only available on Linux. (default: false)
+-clr/--colourful        -   Whether to provide a coloured output. (default: true)
+-se/--suppress-errors   -   Whether to suppress launch errors for metaeditor.exe (really only matters with Wine). (default: false)
+-path/--use-path        -   Whether to search your PATH for .ex4, .dll, and .mqh files. (default: true)
 -s/--alt-settings       -   Alternate settings file as opposed to the default 'forge_commands.json' file.
 ```
 
