@@ -13,67 +13,14 @@
 #define HELP_STRING "MQForge v0.0.1\n\nAll flags optional.\n\n-h/--help\t\t-\tprint this helpfile\n-me/--meta-editor\t-\tREQUIRED: Location for your metaeditor.exe file\n-dh/--default-headers\t-\tLocation directory of standard .mqh header files.\n-wine/--use-wine\t-\tWhether to use Wine to run 'metaeditor.exe' - only available on Linux. (default: false)\n-clr/--colourful\t-\tWhether to provide a coloured output. (default: true)\n-se/--suppress-errors\t-\tWhether to suppress launch errors for metaeditor.exe (really only matters with Wine). (default: false)\n-path/--use-path\t-\tWhether to search your PATH for .ex4, .dll, and .mqh files. (default: true)\n-s/--alt-settings\t-\tAlternate settings file as opposed to the default 'compiler_commands.json' file.\n\n"
 
 int main(int argc, char *argv[]) {
-
 	for (int i = 0; i < argc; i++) {
 		if (check_arg_equals(argv[i], "-h", "--help", NULL)) {
 			printf(HELP_STRING);
 			return 0;
 		}
 
-		else if (check_arg_equals(argv[i], "-me", "--meta-editor", NULL))
-			meta_editor = argv[i + 1];
-
-		else if (check_arg_equals(argv[i], "-dh", "--default-headers", NULL))
-			default_header_location = argv[i + 1];
-
-		else if (check_arg_equals(argv[i], "-wine", "--use-wine", NULL)) {
-			int arg_elem = string_to_bool(string_lower(argv[i + 1]));
-			if (arg_elem == 0) use_wine = false;
-			else if (arg_elem == 1) use_wine = true;
-			else {
-				printf("Err - failed to interpret flag %s's value: %s\n", argv[i], argv[i + 1]);
-				return 0;
-			} 
-		}
-
-		else if (check_arg_equals(argv[i], "-clr", "--colourful", NULL)) {
-			int arg_elem = string_to_bool(string_lower(argv[i + 1]));
-			if (arg_elem == 0) colourful = false;
-			else if (arg_elem == 1) colourful = true;
-			else {
-				printf("Err - failed to interpret flag %s's value: %s\n", argv[i], argv[i + 1]);
-				return 0;
-			} 
-		}
-
-		else if (check_arg_equals(argv[i], "-se", "--suppress-errors", NULL)) {
-			int arg_elem = string_to_bool(string_lower(argv[i + 1]));
-			if (arg_elem == 0) suppress_launch_errors = false;
-			else if (arg_elem == 1) suppress_launch_errors = true;
-			else {
-				printf("Err - failed to interpret flag %s's value: %s\n", argv[i], argv[i + 1]);
-				return 0;
-			} 
-		}
-
-
-		else if (check_arg_equals(argv[i], "-path", "--use-path", NULL)) {
-			int arg_elem = string_to_bool(string_lower(argv[i + 1]));
-			if (arg_elem == 0) use_PATH = false;
-			else if (arg_elem == 1) use_PATH = true;
-			else {
-				printf("Err - failed to interpret flag %s's value: %s\n", argv[i], argv[i + 1]);
-				return 0;
-			} 
-		}
-
-		else if (check_arg_equals(argv[i], "-s", "--alt-settings", NULL))
+		else if (check_arg_equals(argv[i], "-s", "--alt-settings", NULL)) {
 			alt_settings_file = argv[i + 1];
-
-		else if (argv[i][0] == '-' && i > 0) {
-			printf("Unknown flag '%s', helpfile:\n\n", argv[i]);
-			printf(HELP_STRING);
-			return 0;
 		}
 	}
 
@@ -112,6 +59,80 @@ int main(int argc, char *argv[]) {
 			if (string_to_bool(json[i].val) > -1) {
 				use_PATH = string_to_bool(json[i].val);
 			}
+		}
+	}
+
+	for (int i = 0; i < argc; i++) {
+		if (check_arg_equals(argv[i], "-me", "--meta-editor", NULL))
+			meta_editor = argv[i + 1];
+
+		else if (check_arg_equals(argv[i], "-dh", "--default-headers", NULL))
+			default_header_location = argv[i + 1];
+
+		else if (check_arg_equals(argv[i], "-wine", "--use-wine", NULL)) {
+			if (argc - 1 > i && argv[i + 1][0] == '-' || argc - 1 == i) {
+				use_wine = true;
+			}
+			else {
+				int arg_elem = string_to_bool(string_lower(argv[i + 1]));
+				if (arg_elem == 0) use_wine = false;
+				else if (arg_elem == 1) use_wine = true;
+				else {
+					printf("Err - failed to interpret flag %s's value: %s\n", argv[i], argv[i + 1]);
+					return 0;
+				} 
+			}
+		}
+
+		else if (check_arg_equals(argv[i], "-clr", "--colourful", NULL)) {
+			if (argc - 1 > i && argv[i + 1][0] == '-' || argc - 1 == i) {
+				colourful = true;
+			}
+			else {
+				int arg_elem = string_to_bool(string_lower(argv[i + 1]));
+				if (arg_elem == 0) colourful = false;
+				else if (arg_elem == 1) colourful = true;
+				else {
+					printf("Err - failed to interpret flag %s's value: %s\n", argv[i], argv[i + 1]);
+					return 0;
+				}
+			} 
+		}
+
+		else if (check_arg_equals(argv[i], "-se", "--suppress-errors", NULL)) {
+			if (argc - 1 > i && argv[i + 1][0] == '-' || argc - 1 == i) {
+				suppress_launch_errors = true;
+			}
+			else {
+				int arg_elem = string_to_bool(string_lower(argv[i + 1]));
+				if (arg_elem == 0) suppress_launch_errors = false;
+				else if (arg_elem == 1) suppress_launch_errors = true;
+				else {
+					printf("Err - failed to interpret flag %s's value: %s\n", argv[i], argv[i + 1]);
+					return 0;
+				}
+			} 
+		}
+
+		else if (check_arg_equals(argv[i], "-path", "--use-path", NULL)) {
+			if (argc - 1 > i && argv[i + 1][0] == '-' || argc - 1 == i) {
+				use_PATH = true;
+			}
+			else {
+				int arg_elem = string_to_bool(string_lower(argv[i + 1]));
+				if (arg_elem == 0) use_PATH = false;
+				else if (arg_elem == 1) use_PATH = true;
+				else {
+					printf("Err - failed to interpret flag %s's value: %s\n", argv[i], argv[i + 1]);
+					return 0;
+				}
+			} 
+		}
+
+		else if (argv[i][0] == '-' && i > 0) {
+			printf("Unknown flag '%s', helpfile:\n\n", argv[i]);
+			printf(HELP_STRING);
+			return 0;
 		}
 	}
 
