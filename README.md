@@ -33,6 +33,7 @@ Further functionality does exist, however, and it can be seen through the help f
 -path/--use-path        -   Whether to search your PATH for .ex4, .dll, and .mqh files. (default: true)
 -s/--alt-settings       -   Alternate settings file as opposed to the default 'forge_commands.json' file.
 ```
+Boolean flags can be specified either by just passing the flag like `MQForge --use-wine`, or, if you want a specific non-default value (like false), you can pass it like this `MQForge --use-wine false`.
 
 if you want to make compiling easier if you're going to be compiling over and over, you can define a `forge_commands.json` file in the root of your project. This file gives you all the same options that the flags do; here is an example file with the default values:
 ```json
@@ -47,6 +48,6 @@ if you want to make compiling easier if you're going to be compiling over and ov
 ```
 
 With this file it makes it even easier. You can just run MQForge like this in your project directory:
-```
+```nu-script
 MQForge
 ```
