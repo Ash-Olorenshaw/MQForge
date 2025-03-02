@@ -2,14 +2,8 @@
 #include <string.h>
 #include "globals.h"
 #include "utils.h"
-#include "file_utils.h"
 
 int check_file_deps(char file[MAX_TOKEN_SIZE], char import_items[MAX_ARRAY_SIZE][MAX_TOKEN_SIZE]) {
-	char builtin_headers[MAX_ARRAY_SIZE][MAX_TOKEN_SIZE] = {0};
-	//printf("\topening file '%s'\n", file);
-	int builtin_headers_count = search_dir_for_ext(default_header_location, "mqh", builtin_headers);
-	//printf("\tFINISHED searching for mqh...\n");
-
 	char buffer[MAX_TOKEN_SIZE];
 	FILE* filePointer;
 	int line_num = 0;
@@ -61,8 +55,8 @@ int check_file_deps(char file[MAX_TOKEN_SIZE], char import_items[MAX_ARRAY_SIZE]
 			else {
 				char *import_item = rtrim_char(ltrim_char(trim(get_substring(buffer, 7, strlen(buffer) - 1, substring)), '<'), '>');
 				if (import_item && !string_isspace(import_item)) {
-					if (!value_in_string_array(import_item, builtin_headers, *(&builtin_headers + 1) - builtin_headers)) {
-						//printf("Err - unable to find .mqh header file '%s referenced in %s(line: %d)'\n", import_item, file, line_num);
+					if (!value_in_string_array(import_item, available_headers, *(&available_headers + 1) - available_headers)) {
+						printf("Err - unable to find .mqh header file '%s referenced in %s(line: %d)'\n", import_item, file, line_num);
 						return 400;
 					}
 				}
