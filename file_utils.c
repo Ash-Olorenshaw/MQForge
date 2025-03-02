@@ -15,14 +15,29 @@
 #endif
 
 
-int isDirectory(const char *path) {
+int is_directory(const char *path) {
 	struct stat statbuf;
 	if (stat(path, &statbuf) != 0)
 		return 0;
 	return S_ISDIR(statbuf.st_mode);
 }
 
-void listFilesRecursively(const char *basePath, char files[MAX_ARRAY_SIZE][MAX_TOKEN_SIZE], int *files_size)
+bool file_exists(char *filename) {
+	struct stat buffer;   
+	return stat(filename, &buffer) == 0;
+}
+
+char *convert_wine_path(char *path, char final_string[MAX_TOKEN_SIZE]) {
+	strcpy(final_string, "C:");
+	char *temp_path = strdup(path);
+	if (strstr(path, "drive_c") != NULL) {
+		temp_path = split_get_second_half(temp_path, "drive_c");
+		strncat(final_string, temp_path, MAX_TOKEN_SIZE);
+	}
+	return final_string;
+}
+
+void list_files_recursively(const char *basePath, char files[MAX_ARRAY_SIZE][MAX_TOKEN_SIZE], int *files_size)
 {
 	char path[1000];
 	struct dirent *dp;
@@ -41,13 +56,13 @@ void listFilesRecursively(const char *basePath, char files[MAX_ARRAY_SIZE][MAX_T
 			strcat(path, "/");
 			strcat(path, dp->d_name);
 
-			if (!isDirectory(path)) {
+			if (!is_directory(path)) {
 				if (*files_size < MAX_ARRAY_SIZE - 1) {
-					strcpy(files[(*files_size)++], dp->d_name);
+					strcpy(files[(*files_size)++], path);
 				}
 			}
 
-			listFilesRecursively(path, files, files_size);
+			list_files_recursively(path, files, files_size);
 		}
 	}
 	closedir(dir);
@@ -58,7 +73,7 @@ int search_dir_for_ext(const char *target_path, const char *extension, char file
 	char all_files[MAX_ARRAY_SIZE][MAX_TOKEN_SIZE] = {0};
 	int fileptr = 0;
 	//printf("\t\trecursive list:\n");
-	listFilesRecursively(target_path, all_files, &fileptr);
+	list_files_recursively(target_path, all_files, &fileptr);
 	//printf("\t\tfinished recursive search\n");
 
 	int files_found = 0;
@@ -82,7 +97,7 @@ int search_dir_for_ext(const char *target_path, const char *extension, char file
 }
 
 int search_PATH_for_ext(const char *extension, char additional_dirs[MAX_ARRAY_SIZE][MAX_TOKEN_SIZE], char files[MAX_ARRAY_SIZE][MAX_TOKEN_SIZE]) {
-	int current_files_found = search_dir_for_ext(".", extension, files);
+	int current_files_found = search_dir_for_ext(work_area, extension, files);
 	char path_dirs[MAX_ARRAY_SIZE][MAX_TOKEN_SIZE] = {0};
 	get_PATH(path_dirs);
 
