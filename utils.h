@@ -8,7 +8,6 @@ char *string_lower(char *str);
 
 int string_to_bool(const char *item);
 bool check_arg_equals(const char *flags, ...);
-bool file_exists(char *filename);
 
 char *ltrim_char(char *str, char target_char);
 char *rtrim_char(char *str, char target_char);

@@ -84,11 +84,6 @@ char *extract_delimited_string(char *input, const char target_char) {
 	return input;
 }
 
-bool file_exists(char *filename) {
-	struct stat buffer;   
-	return stat(filename, &buffer) == 0;
-}
-
 char *trim_char(char *str, char target_char) {
 	char *ltrimmed = ltrim_char(str, target_char);
 	char *rtrimmed = rtrim_char(ltrimmed, target_char);
@@ -172,11 +167,10 @@ int split_string(char *string_item, char delimiter, char tokens_out[MAX_ARRAY_SI
 
 char *split_get_second_half(char *str, const char *delim) {
 	char *p = strstr(str, delim);
+	if (p == NULL) return NULL;
 
-	if (p == NULL) return NULL;     // delimiter not found
-
-	*p = '\0';                      // terminate string after head
-	return p + strlen(delim);       // return tail substring
+	*p = '\0';
+	return p + strlen(delim);
 }
 
 
