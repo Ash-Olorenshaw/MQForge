@@ -1,6 +1,6 @@
 #include <stdbool.h>
 
-#define MAX_TOKEN_SIZE 256
+#define MAX_TOKEN_SIZE 1024
 #define MAX_ARRAY_SIZE 500
 #define MAX_PATH_LEN 1024
 #define MAX_JSON_KEYS 256
@@ -21,5 +21,6 @@ bool colourful = true;
 bool suppress_launch_errors = false;
 bool use_PATH = true;
 char *alt_settings_file = "forge_commands.json";
+char *work_area = ".";
 struct map_element_array dependency_dict[MAX_ARRAY_SIZE] = {0};
 

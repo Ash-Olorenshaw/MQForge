@@ -24,6 +24,7 @@ extern bool colourful;
 extern bool suppress_launch_errors;
 extern bool use_PATH;
 extern char *alt_settings_file;
+extern char *work_area;
 extern struct map_element_array dependency_dict[MAX_ARRAY_SIZE];
 
 #endif

@@ -7,6 +7,7 @@
 #include <stdint.h>
 
 #include "utils.h"
+#include "file_utils.h"
 
 #ifdef _WIN32
 #include "sys_interactions_windows.h"
@@ -17,37 +18,11 @@
 #define BOM_UTF16_LE 0xFFFE
 #define BOM_UTF16_BE 0xFEFF
 
-bool is_bom_string(char *target_string) {
-	char *str = strdup(target_string);
-	uint16_t current_char = ((uint16_t)(unsigned char)str[0] << 8) | (unsigned char)str[1];
-	return (current_char == BOM_UTF16_BE || current_char == BOM_UTF16_LE);
-}
 
-
-
-bool starts_with_bom(const char *str) {
-	//printf("\n\ntesting '%s'\n\n", str);
-	uint16_t current_char;
-
-	if (str[0] == '\0' || str[1] == '\0') {
-		return false;
-	}
-
-	current_char = ((uint16_t)(unsigned char)str[0] << 8) | (unsigned char)str[1];
-
-	if (current_char == BOM_UTF16_BE || current_char == BOM_UTF16_LE) {
-		return true;
-	}
-
-	return false;
-}
-
-
-// Read a UTF-16 character with specified endianness
 int read_utf16_char_file(FILE *file, uint16_t *ch) {
 	uint8_t bytes[2];
 	if (fread(bytes, 1, 2, file) != 2) {
-		return 0;  // End of file or read error
+		return 0;
 	}
 	*ch = bytes[0] | (bytes[1] << 8);
 	return 1;
@@ -239,7 +214,9 @@ int compile_file(char target_file[MAX_TOKEN_SIZE]) {
 	char final_response[MAX_TOKEN_SIZE * 10] = "";
 
 	if (use_wine) {
-		snprintf(popen_command, MAX_TOKEN_SIZE, "wine \"%s\" /compile:\"%s\" /log:errors.log 2>&1", meta_editor, target_file);
+		char new_file[MAX_TOKEN_SIZE];
+		convert_wine_path(target_file, new_file);
+		snprintf(popen_command, MAX_TOKEN_SIZE, "wine \"%s\" /compile:\"%s\" /log:errors.log 2>&1", meta_editor, new_file);
 		proc = popen(popen_command, "r");
 	}
 	else {
