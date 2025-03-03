@@ -27,9 +27,8 @@ MQForge /path/to/project -me /path/to/metaeditor.exe
 Further functionality does exist, and it can be seen through the help file, which is invoked with the `--help` flag, which is also shown here:
 
 <details>
-  <summary>Helpfile</summary>
+    <summary>Helpfile</summary>
 
-    ```
     MQForge
 
     OPTIONAL: 
