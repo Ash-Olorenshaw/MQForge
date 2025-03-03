@@ -140,7 +140,17 @@ int create_file_order(char files[MAX_ARRAY_SIZE][MAX_TOKEN_SIZE], char dependenc
 			int success = check_file_deps(files[ifile], deps);
 			if (success == 200) {
 				for (int idep = 0; idep < MAX_ARRAY_SIZE; idep++) {
-					strcpy(dependency_dict[ifile].val[idep], deps[idep]);
+					char *dep = trim(strdup(deps[idep]));
+					if (dep != NULL && strcmp(dep, "") != 0) {
+						if (dep[1] != '\\' && dep[1] != '/' && dep[1] != ':') {
+							char new_dep[MAX_TOKEN_SIZE] = "./";
+							strcat(new_dep, dep);
+							strcpy(dependency_dict[ifile].val[idep], new_dep);
+						}
+						else {
+							strcpy(dependency_dict[ifile].val[idep], dep);
+						}
+					}
 				}
 				dependency_dict[ifile].key = files[ifile];
 			}

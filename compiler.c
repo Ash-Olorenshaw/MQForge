@@ -215,7 +215,10 @@ int compile_file(char target_file[MAX_TOKEN_SIZE]) {
 
 	if (use_wine) {
 		char new_file[MAX_TOKEN_SIZE];
-		convert_wine_path(target_file, new_file);
+		int conversion_success = convert_wine_path(target_file, new_file);
+		if (conversion_success == 400) {
+			strcpy(new_file, target_file);
+		}
 		snprintf(popen_command, MAX_TOKEN_SIZE, "wine \"%s\" /compile:\"%s\" /log:errors.log 2>&1", meta_editor, new_file);
 		proc = popen(popen_command, "r");
 	}

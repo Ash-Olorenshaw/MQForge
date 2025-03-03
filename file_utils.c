@@ -27,14 +27,15 @@ bool file_exists(char *filename) {
 	return stat(filename, &buffer) == 0;
 }
 
-char *convert_wine_path(char *path, char final_string[MAX_TOKEN_SIZE]) {
-	strcpy(final_string, "C:");
-	char *temp_path = strdup(path);
+int convert_wine_path(char *path, char final_string[MAX_TOKEN_SIZE]) {
 	if (strstr(path, "drive_c") != NULL) {
+		char *temp_path = strdup(path);
+		strcpy(final_string, "C:");
 		temp_path = split_get_second_half(temp_path, "drive_c");
 		strncat(final_string, temp_path, MAX_TOKEN_SIZE);
+		return 200;
 	}
-	return final_string;
+	return 400;
 }
 
 void list_files_recursively(const char *basePath, char files[MAX_ARRAY_SIZE][MAX_TOKEN_SIZE], int *files_size)
