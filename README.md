@@ -6,6 +6,12 @@ A tool for making compiling MetaQuotes files from the commandline using the Meta
 
 `MQForge` is designed for use with MQ4 code (should probably work with MQ5 too, but untested). It does *not* replace `Meta Editor` as compiler, it simply extends its functionality to make it easier to compile `.mq4` files from the commandline. 
 
+Some of the really cool (in my humble opinion) features of `MQForge` are:
+
+`coloured outputs`:
+![Coloured outputs](/Screenshots/main.png?raw=true "Coloured output example")
+
+
 `MQForge` achieves this through these steps:
 - read all files recursively in current directory
 - establish dependency tree (warn/stop if dependencies not found)
@@ -49,7 +55,15 @@ Further functionality does exist, and it can be seen through the help file, whic
 
 </details>
 
-Boolean flags can be specified either by just passing the flag like `MQForge --use-wine`, or, if you want a specific non-default value (like false), you can pass it like this `MQForge --use-wine false`.
+Boolean flags can be specified either by just passing the flag like this:
+```nu-script
+MQForge --use-wine
+```
+
+or, if you want a specific non-default value (like false), you can pass it like this:
+```nu-script
+MQForge --use-wine false
+```
 
 if you want to make compiling easier if you're going to be compiling over and over, you can define a `forge_commands.json` file in the root of your project. This file gives you all the same options that the flags do; here is an example file with the default values:
 ```json
