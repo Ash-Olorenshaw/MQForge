@@ -223,7 +223,7 @@ int compile_file(char target_file[MAX_TOKEN_SIZE]) {
 		proc = popen(popen_command, "r");
 	}
 	else {
-		snprintf(popen_command, MAX_TOKEN_SIZE, "\"%s\" /compile:\"%s\" /log:errors.log 2>&1", meta_editor, target_file);
+		snprintf(popen_command, MAX_TOKEN_SIZE, "\"\"%s\" /compile:\"%s\" /log:errors.log 2>&1\"", meta_editor, target_file);
 		proc = popen(popen_command, "r");
 	}
 	printf("Compiling file '%s' with '%s'\n", target_file, popen_command);
