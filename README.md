@@ -46,7 +46,6 @@ Further functionality does exist, and it can be seen through the help file, whic
     [-se/--suppress-errors]   -   (default: false) Whether to suppress launch errors for metaeditor.exe (really only matters with Wine).
     [-path/--use-path]        -   (default: true) Whether to search your PATH for .ex4, .dll, and .mqh files.
     [-s/--alt-settings]       -   Alternate settings file as opposed to the default 'forge_commands.json' file.
-    ```
 
 </details>
 
