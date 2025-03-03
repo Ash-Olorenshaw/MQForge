@@ -9,6 +9,7 @@ A tool for making compiling MetaQuotes files from the commandline using the Meta
 Some of the really cool (in my humble opinion) features of `MQForge` are:
 
 `coloured outputs`:
+
 ![Coloured outputs](/Screenshots/main.png?raw=true "Coloured output example")
 
 
