@@ -8,12 +8,26 @@ A tool for making compiling MetaQuotes files from the commandline using the Meta
 
 Some of the really cool (in my humble opinion) features of `MQForge` are:
 
-`coloured outputs`:
+- better error messages output directly in your terminal:
 
-![Coloured outputs](/Screenshots/main.png?raw=true "Coloured output example")
+	![Coloured outputs](/Screenshots/main.png?raw=true "Coloured output example")
+- simplicity:
+	```bash
+	# instead of 
+ 	/path/to/metaeditor.exe /compile:"file.mq4" /log:errors.log
+ 
+ 	# simply run
+ 	MQForge
 
+ 	# or
+ 	MQForge -me /path/to/metaeditor.exe
+ 	# if you don't have a config file setup.
+ 	```
+- easy multifile compilation
 
-`MQForge` achieves this through these steps:
+  	If you use `#import` instead of `#include`, `MQForge` simplifies compiling all these files by establishing a dependency tree before compiling in order.
+
+`MQForge` follows these rough steps when performing a compile:
 - read all files recursively in current directory
 - establish dependency tree (warn/stop if dependencies not found)
 - compile all files in the correct sequence using `metaeditor.exe`
