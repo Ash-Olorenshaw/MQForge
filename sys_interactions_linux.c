@@ -17,7 +17,7 @@ int get_PATH(char final_PATH_elems[MAX_ARRAY_SIZE][MAX_TOKEN_SIZE]) {
 
 	p = popen("echo $PATH","r");   
 	if (p == NULL) {
-		printf("Unable to open $PATH... skipping...\n");
+		fprintf(stderr, "Err - Unable to open $PATH... skipping...\n");
 		return 0;
 	}
 	while((ch = fgetc(p)) != EOF) {

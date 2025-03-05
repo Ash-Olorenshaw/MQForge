@@ -1,6 +1,7 @@
 #include <stdbool.h>
 #include <stdarg.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "utils.h"
@@ -54,14 +55,14 @@ void read_basic_json(char *target_file, int *json_size, struct mapElement (*json
 		fclose(file_ptr);
 	}
 	else {
-		printf("Err - file can't be opened: '%s' \n", target_file);
-		return;
+		fprintf(stderr, "Err - file can't be opened: '%s' \n", target_file);
+		exit(1);
 	}
 
 	trim(buffer);
 	if (buffer[0] != '{' || buffer[strlen(buffer) - 1] != '}') {
-		printf("Err - Unable to find leading and trailing {}s in json file %s.", target_file);
-		return;
+		fprintf(stderr, "Err - Unable to find leading and trailing {}s in json file %s.", target_file);
+		exit(1);
 	}
 
 	*json_size = string_occurences(buffer, ',') + 1;
@@ -91,20 +92,24 @@ void read_basic_json(char *target_file, int *json_size, struct mapElement (*json
 						(*json_items)[i].val = strdup(item);
 					}
 					else {
-						printf("Err - item '%s' is neither a string or bool.\n", item);
+						fprintf(stderr, "Err - item '%s' is neither a string or bool.\n", item);
+						exit(1);
 					}
 				}
 				else {
-					printf("Err - key '%s' cannot be interpreted as a string.\n", key);
+					fprintf(stderr, "Err - key '%s' cannot be interpreted as a string.\n", key);
+					exit(1);
 				}
 			}
 			else {
-				printf("Err - failed to split item '%s'\n", trimmed_item);
+				fprintf(stderr, "Err - failed to split item '%s'\n", trimmed_item);
+				exit(1);
 			}
 		}
 	}
 	else {
-		printf("Err - failed to allocate memory when reading '%s'\n", buffer);
+		fprintf(stderr, "Err - failed to allocate memory when reading '%s'\n", buffer);
+		exit(1);
 	}
 }
 

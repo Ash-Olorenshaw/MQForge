@@ -50,7 +50,7 @@ size_t append_utf8_char(char *buffer, size_t offset, uint32_t codepoint) {
 char *read_error_log(char *utf8_buffer) {
 	FILE *in = fopen("errors.log", "rb");
 	if (!in) {
-		printf("Error opening input file");
+		fprintf(stderr, "Err - unable to open errors.log file for metaeditor.exe\n");
 		return NULL;
 	}
 

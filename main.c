@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdbool.h>
+#include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
 
@@ -93,8 +94,8 @@ int main(int argc, char *argv[]) {
 				if (arg_elem == 0) use_wine = false;
 				else if (arg_elem == 1) use_wine = true;
 				else {
-					printf("Err - failed to interpret flag %s's value: %s\n", argv[arg_num], argv[arg_num + 1]);
-					return 0;
+					fprintf(stderr, "Err - failed to interpret flag %s's value: %s\n", argv[arg_num], argv[arg_num + 1]);
+					exit(1);
 				} 
 			}
 		}
@@ -108,8 +109,8 @@ int main(int argc, char *argv[]) {
 				if (arg_elem == 0) colourful = false;
 				else if (arg_elem == 1) colourful = true;
 				else {
-					printf("Err - failed to interpret flag %s's value: %s\n", argv[arg_num], argv[arg_num + 1]);
-					return 0;
+					fprintf(stderr, "Err - failed to interpret flag %s's value: %s\n", argv[arg_num], argv[arg_num + 1]);
+					exit(1);
 				}
 			} 
 		}
@@ -123,8 +124,8 @@ int main(int argc, char *argv[]) {
 				if (arg_elem == 0) suppress_launch_errors = false;
 				else if (arg_elem == 1) suppress_launch_errors = true;
 				else {
-					printf("Err - failed to interpret flag %s's value: %s\n", argv[arg_num], argv[arg_num + 1]);
-					return 0;
+					fprintf(stderr, "Err - failed to interpret flag %s's value: %s\n", argv[arg_num], argv[arg_num + 1]);
+					exit(1);
 				}
 			} 
 		}
@@ -138,23 +139,23 @@ int main(int argc, char *argv[]) {
 				if (arg_elem == 0) use_PATH = false;
 				else if (arg_elem == 1) use_PATH = true;
 				else {
-					printf("Err - failed to interpret flag %s's value: %s\n", argv[arg_num], argv[arg_num + 1]);
-					return 0;
+					fprintf(stderr, "Err - failed to interpret flag %s's value: %s\n", argv[arg_num], argv[arg_num + 1]);
+					exit(1);
 				}
 			} 
 		}
 
 		else if (argv[arg_num][0] == '-' && arg_num > 0) {
-			printf("Unknown flag '%s', helpfile:\n\n", argv[arg_num]);
+			fprintf(stderr, "Err - Unknown flag '%s', helpfile:\n\n", argv[arg_num]);
 			printf(VERSION_STRING);
 			printf(HELP_STRING);
-			return 0;
+			exit(1);
 		}
 	}
 
 	if (meta_editor == NULL || strcmp(meta_editor, "") == 0) {
-		printf("Err - you must include a 'metaeditor.exe' location to compile. Either use flags -me/--meta-editor or key 'meta_editor' in forge_commands.json");
-		return 0;
+		fprintf(stderr, "Err - you must include a 'metaeditor.exe' location to compile. Either use flags -me/--meta-editor or key 'meta_editor' in forge_commands.json\n");
+		exit(1);
 	}
 
 	printf("Starting compile with:\n");
@@ -184,6 +185,6 @@ int main(int argc, char *argv[]) {
 		remove("errors.log");
 	}
 
-	return 1;
+	return 0;
 }
 

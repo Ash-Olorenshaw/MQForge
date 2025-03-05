@@ -36,18 +36,18 @@ int check_file_deps(char file[MAX_TOKEN_SIZE], char import_items[MAX_ARRAY_SIZE]
 					else if (strcmp(extension, ".mqh") == 0) {
 						//printf("\tfound header...\n");
 						if (!value_in_string_array(import_item, available_headers, *(&available_headers + 1) - available_headers)) {
-							printf("Err - unable to find .mqh header file '%s' referenced in %s (line: %d)\n", import_item, file, line_num);
+							fprintf(stderr, "Err - unable to find .mqh header file '%s' referenced in %s (line: %d)\n", import_item, file, line_num);
 							return 400;
 						}
 					}
 					else if (strcmp(string_lower(extension), ".dll") == 0) {
 						if (!value_in_string_array(import_item, available_dlls, *(&available_dlls + 1) - available_dlls)) {
-							printf("Err - unable to find dll '%s' referenced in %s (line: %d)\n", import_item, file, line_num);
+							fprintf(stderr, "Err - unable to find dll '%s' referenced in %s (line: %d)\n", import_item, file, line_num);
 							return 400;
 						}
 					}
 					else {
-						printf("Err - unrecognised imported file extension: '%s' for '%s' in '%s'\n", extension, buffer, file);
+						fprintf(stderr, "Err - unrecognised imported file extension: '%s' for '%s' in '%s'\n", extension, buffer, file);
 						return 400;
 					}
 				}
@@ -56,7 +56,7 @@ int check_file_deps(char file[MAX_TOKEN_SIZE], char import_items[MAX_ARRAY_SIZE]
 				char *import_item = rtrim_char(ltrim_char(trim(get_substring(buffer, 7, strlen(buffer) - 1, substring)), '<'), '>');
 				if (import_item && !string_isspace(import_item)) {
 					if (!value_in_string_array(import_item, available_headers, *(&available_headers + 1) - available_headers)) {
-						printf("Err - unable to find .mqh header file '%s referenced in %s(line: %d)'\n", import_item, file, line_num);
+						fprintf(stderr, "Err - unable to find .mqh header file '%s referenced in %s(line: %d)'\n", import_item, file, line_num);
 						return 400;
 					}
 				}

@@ -148,7 +148,7 @@ int split_string(char *string_item, char delimiter, char tokens_out[MAX_ARRAY_SI
 		}
 		else if (i == (strlen(string_item) - 1)) {
 			if (strlen(current_string) > MAX_TOKEN_SIZE - 1) {
-				printf("Err - String %s exceeded expected token size of %d", string_item, MAX_TOKEN_SIZE);
+				fprintf(stderr, "Err - String %s exceeded expected token size of %d when splitting...\n", string_item, MAX_TOKEN_SIZE);
 				return 400;
 			}
 			current_string[strlen(current_string)] = ch;
