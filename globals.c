@@ -20,7 +20,7 @@ bool use_wine = false;
 bool colourful = true;
 bool suppress_launch_errors = false;
 bool use_PATH = true;
-char *alt_settings_file = "forge_commands.json";
+char alt_settings_file[MAX_TOKEN_SIZE] = "forge_commands.json";
 char *work_area = ".";
 struct map_element_array dependency_dict[MAX_ARRAY_SIZE] = {0};
 

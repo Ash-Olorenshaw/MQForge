@@ -14,6 +14,11 @@
 #define HELP_STRING "\nOPTIONAL:\n[<filepath>]\n\nREQUIRED:\n[-me/--meta-editor]\t-\tLocation for your metaeditor.exe file.\n\nOPTIONAL:\n[-h/--help]\t\t-\tprint this helpfile\n[-v/--version]\t\t-\tprint program version\n[-dh/--default-headers]\t-\tLocation directory of standard .mqh header files.\n[-wine/--use-wine]\t-\t(default: false) Whether to use Wine to run 'metaeditor.exe' - only available on Linux.\n[-clr/--colourful]\t-\t(default: true) Whether to provide a coloured output.\n[-se/--suppress-errors]\t-\t(default: false) Whether to suppress launch errors for metaeditor.exe (really only matters with Wine).\n[-path/--use-path]\t-\t(default: true) Whether to search your PATH for .ex4, .dll, and .mqh files.\n[-s/--alt-settings]\t-\tAlternate settings file as opposed to the default 'compiler_commands.json' file.\n\n"
 #define VERSION_STRING "MQForge v0.0.1\n"
 
+#ifdef _WIN32
+#include "sys_interactions_windows.h"
+#else
+#include "sys_interactions_linux.h"
+#endif
 // cmake -DTARGET_PLATFORM=Linux -B build -S . && cd build && make && cd ..
 
 int main(int argc, char *argv[]) {
@@ -30,7 +35,7 @@ int main(int argc, char *argv[]) {
 		}
 
 		else if (check_arg_equals(argv[i], "-s", "--alt-settings", NULL)) {
-			alt_settings_file = argv[i + 1];
+			strcpy(alt_settings_file, argv[i + 1]);
 		}
 	}
 
@@ -158,7 +163,15 @@ int main(int argc, char *argv[]) {
 		exit(1);
 	}
 
-	printf("Starting compile with:\n");
+	if ((strcmp(OS_NAME, "Linux") == 0 && alt_settings_file[0] != '/') || (strcmp(OS_NAME, "Windows") == 0 && alt_settings_file[1] != ':')) {
+		char relative_settings_file[MAX_TOKEN_SIZE];
+		strcpy(relative_settings_file, work_area);
+		strcat(relative_settings_file, "/");
+		strcat(relative_settings_file, alt_settings_file);
+		strcpy(alt_settings_file, relative_settings_file);
+	}
+
+	printf("Starting compile in %s with:\n", work_area);
 	printf("\t- meta_editor = '%s'\n", meta_editor);
 	printf("\t- default_header_location = '%s'\n", default_header_location);
 	printf("\t- use_wine = %s\n", use_wine ? "true" : "false");
