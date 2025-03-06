@@ -6,9 +6,6 @@
 #include "utils.h"
 #include "globals.h"
 
-#define OS_NAME "Windows"
-#define PATH_SIZE 1000
-
 int get_PATH(char final_PATH_elems[MAX_ARRAY_SIZE][MAX_TOKEN_SIZE]) {
 	FILE *p;
 	int ch;

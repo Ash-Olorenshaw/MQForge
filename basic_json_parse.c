@@ -6,11 +6,7 @@
 
 #include "utils.h"
 #include "globals.h"
-
-struct mapElement {
-	char *key;
-	char *val;
-};
+#include "basic_json_parse.h"
 
 int split_respect_strings(char *string_item, char delimiter, char tokens_out[MAX_TOKEN_SIZE][MAX_JSON_KEYS]) {
 	char current_string[MAX_TOKEN_SIZE] = {0};
