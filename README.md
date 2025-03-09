@@ -38,7 +38,11 @@ A tool for making compiling MetaQuotes files from the commandline using the Meta
 
 ## Usage
 
-Setting up and using `MQForge` is pretty simple. Once you have your binary, if you won't be using a `forge_commands.json` file, you simply invoke it in the directory where your files are with the path to your `metaeditor.exe` file, like so:
+Setting up and using `MQForge` is pretty simple.
+
+To get a binary, head over to the [**Releases**](https://github.com/Ash-Olorenshaw/MQForge/releases) page and grab the .zip relevant to your platform and extract it. It should contain a single binary, which is all you need.
+
+Once you have your binary, if you won't be using a `forge_commands.json` file, you simply invoke it in the directory where your files are with the path to your `metaeditor.exe` file, like so:
 ```nu-script
 MQForge -me /path/to/metaeditor.exe
 ```
