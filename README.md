@@ -87,7 +87,7 @@ or, if you want a specific non-default value (like false), you can pass it like 
 MQForge --use-wine false
 ```
 
-if you want to make compiling easier if you're going to be compiling over and over, you can define a `forge_commands.json` file in the root of your project. This file gives you all the same options that the flags do; here is an example file with the default values:
+if you want to make compiling easier if you're going to be compiling over and over, you can define a `forge_commands.json` file in the root of your project (an example titled `forge_commands_example.json` is in the root of this project). This file gives you all the same options that the flags do; here is an example file with the default values:
 ```json
 {
 	"meta_editor" : "/path/to/metaeditor.exe",
