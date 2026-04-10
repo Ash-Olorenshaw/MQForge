@@ -1,4 +1,5 @@
 #include <stdbool.h>
+#include <stdlib.h>
 #include <stdarg.h>
 #include <dirent.h>
 #include <sys/stat.h>
@@ -23,7 +24,7 @@ int is_directory(const char *path) {
 }
 
 bool file_exists(char *filename) {
-	struct stat buffer;   
+	struct stat buffer;
 	return stat(filename, &buffer) == 0;
 }
 
@@ -38,21 +39,17 @@ int convert_wine_path(char *path, char final_string[MAX_TOKEN_SIZE]) {
 	return 400;
 }
 
-void list_files_recursively(const char *basePath, char files[MAX_ARRAY_SIZE][MAX_TOKEN_SIZE], int *files_size)
-{
-	char path[1000];
+void list_files(const char *basePath, char files[MAX_ARRAY_SIZE][MAX_TOKEN_SIZE], int *files_size, bool recurse) {
+	char *path;
 	struct dirent *dp;
 	DIR *dir = opendir(basePath);
 
-	// Unable to open directory stream
-	if (!dir){
+	if (!dir)
 		return;
-	}
 
-	while ((dp = readdir(dir)) != NULL)
-	{
-		if (strcmp(dp->d_name, ".") != 0 && strcmp(dp->d_name, "..") != 0)
-		{
+	while ((dp = readdir(dir)) != NULL) {
+		if (strcmp(dp->d_name, ".") != 0 && strcmp(dp->d_name, "..") != 0) {
+			path = malloc(sizeof(char) * strlen(basePath) + 1 + strlen(dp->d_name) + 1);
 			strcpy(path, basePath);
 			strcat(path, "/");
 			strcat(path, dp->d_name);
@@ -63,33 +60,30 @@ void list_files_recursively(const char *basePath, char files[MAX_ARRAY_SIZE][MAX
 				}
 			}
 
-			list_files_recursively(path, files, files_size);
+			if (recurse)
+				list_files(path, files, files_size, true);
+			free(path);
 		}
 	}
 	closedir(dir);
 }
 
-int search_dir_for_ext(const char *target_path, const char *extension, char files[MAX_ARRAY_SIZE][MAX_TOKEN_SIZE]) {
-	//printf("\t\tstarting search in %s for %s\n", target_path, extension);
+int search_dir_for_ext(const char *target_path, const char *extension, char files[MAX_ARRAY_SIZE][MAX_TOKEN_SIZE], bool recurse) {
 	char all_files[MAX_ARRAY_SIZE][MAX_TOKEN_SIZE] = {0};
 	int fileptr = 0;
-	//printf("\t\trecursive list:\n");
-	list_files_recursively(target_path, all_files, &fileptr);
-	//printf("\t\tfinished recursive search\n");
+
+	list_files(target_path, all_files, &fileptr, recurse);
 
 	int files_found = 0;
 
 	for (int i = 0; i < fileptr; i++) {
 		char lines[MAX_ARRAY_SIZE][MAX_TOKEN_SIZE] = {0};
-		//printf("\t\tloop... %d\n", i);
 
 		int splits = split_string(all_files[i], '.', lines);
-		//printf("\t\tsplit with num %d... \n", splits);
 		if (splits > 0 && files_found < MAX_ARRAY_SIZE) {
 			if (strcmp(lines[splits - 1], extension) == 0) {
-				//printf("\t\tcopying %s... \n", all_files[i]);
 				strcpy(files[files_found++], all_files[i]);
-				//printf("\t\tcopy finished... %s\n", files[files_found]);
+				// printf("Searching file %s\n", files[files_found]);
 			}
 		}
 	}
@@ -98,11 +92,9 @@ int search_dir_for_ext(const char *target_path, const char *extension, char file
 }
 
 int search_PATH_for_ext(const char *extension, char additional_dirs[MAX_ARRAY_SIZE][MAX_TOKEN_SIZE], char files[MAX_ARRAY_SIZE][MAX_TOKEN_SIZE]) {
-	int current_files_found = search_dir_for_ext(work_area, extension, files);
+	int current_files_found = search_dir_for_ext(work_area, extension, files, false);
 	char path_dirs[MAX_ARRAY_SIZE][MAX_TOKEN_SIZE] = {0};
 	get_PATH(path_dirs);
-
-	int additional_dirs_size = *(&additional_dirs + 1) - additional_dirs;
 
 	char all_dirs[MAX_ARRAY_SIZE * 2][MAX_TOKEN_SIZE] = {0};
 	int all_dirs_index = 0;
@@ -111,7 +103,7 @@ int search_PATH_for_ext(const char *extension, char additional_dirs[MAX_ARRAY_SI
 			strcpy(all_dirs[all_dirs_index++], path_dirs[i]);
 		}
 
-		if (additional_dirs_size > 0 && additional_dirs[i] != NULL && strcmp(additional_dirs[i], "") != 0) {
+		if (additional_dirs[i] != NULL && strcmp(additional_dirs[i], "") != 0) {
 			strcpy(all_dirs[all_dirs_index++], additional_dirs[i]);
 		}
 	}
@@ -119,14 +111,13 @@ int search_PATH_for_ext(const char *extension, char additional_dirs[MAX_ARRAY_SI
 	int insertion_ptr = current_files_found;
 	for (int idir = 0; idir < all_dirs_index + 1; idir++) {
 		char new_dir_files[MAX_ARRAY_SIZE][MAX_TOKEN_SIZE] = {0};
-		//memset(new_dir_files, 0, sizeof(new_dir_files));
-		int new_files_found = search_dir_for_ext(all_dirs[idir], extension, files);
+		// printf("Searching directory %s for extension %s\n", all_dirs[idir], extension);
+		int new_files_found = search_dir_for_ext(all_dirs[idir], extension, files, false);
 		if (new_files_found + insertion_ptr < MAX_ARRAY_SIZE) {
 			memcpy(files + insertion_ptr, new_dir_files, new_files_found * sizeof(char *));
 			insertion_ptr += new_files_found;
 		}
 	}
-	//printf("finished search...\n");
 
 	return insertion_ptr;
 }

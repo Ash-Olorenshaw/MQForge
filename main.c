@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
+#include <pthread.h>
 
 #include "basic_json_parse.h"
 #include "file_utils.h"
@@ -10,6 +11,7 @@
 #include "globals.h"
 #include "file_orderer.h"
 #include "compiler.h"
+#include "utils/printer.h"
 
 #define HELP_STRING "\nOPTIONAL:\n[<filepath>]\n\nREQUIRED:\n[-me/--meta-editor]\t-\tLocation for your metaeditor.exe file.\n\nOPTIONAL:\n[-h/--help]\t\t-\tprint this helpfile\n[-v/--version]\t\t-\tprint program version\n[-dh/--default-headers]\t-\tLocation directory of standard .mqh header files.\n[-wine/--use-wine]\t-\t(default: false) Whether to use Wine to run 'metaeditor.exe' - only available on Linux.\n[-clr/--colourful]\t-\t(default: true) Whether to provide a coloured output.\n[-se/--suppress-errors]\t-\t(default: false) Whether to suppress launch errors for metaeditor.exe (really only matters with Wine).\n[-path/--use-path]\t-\t(default: true) Whether to search your PATH for .ex4, .dll, and .mqh files.\n[-s/--alt-settings]\t-\tAlternate settings file as opposed to the default 'compiler_commands.json' file.\n\n"
 #define VERSION_STRING "MQForge v0.0.1\n"
@@ -101,7 +103,7 @@ int main(int argc, char *argv[]) {
 				else {
 					fprintf(stderr, "Err - failed to interpret flag %s's value: %s\n", argv[arg_num], argv[arg_num + 1]);
 					exit(1);
-				} 
+				}
 			}
 		}
 
@@ -117,7 +119,7 @@ int main(int argc, char *argv[]) {
 					fprintf(stderr, "Err - failed to interpret flag %s's value: %s\n", argv[arg_num], argv[arg_num + 1]);
 					exit(1);
 				}
-			} 
+			}
 		}
 
 		else if (check_arg_equals(argv[arg_num], "-se", "--suppress-errors", NULL)) {
@@ -132,7 +134,7 @@ int main(int argc, char *argv[]) {
 					fprintf(stderr, "Err - failed to interpret flag %s's value: %s\n", argv[arg_num], argv[arg_num + 1]);
 					exit(1);
 				}
-			} 
+			}
 		}
 
 		else if (check_arg_equals(argv[arg_num], "-path", "--use-path", NULL)) {
@@ -147,7 +149,7 @@ int main(int argc, char *argv[]) {
 					fprintf(stderr, "Err - failed to interpret flag %s's value: %s\n", argv[arg_num], argv[arg_num + 1]);
 					exit(1);
 				}
-			} 
+			}
 		}
 
 		else if (argv[arg_num][0] == '-' && arg_num > 0) {
@@ -179,15 +181,23 @@ int main(int argc, char *argv[]) {
 	printf("\t- suppress_launch_errors = %s\n", suppress_launch_errors ? "true" : "false");
 	printf("\t- use_PATH = %s\n", use_PATH ? "true" : "false");
 
-	char meta_quotes_files[MAX_ARRAY_SIZE][MAX_TOKEN_SIZE] = {0};
-	int meta_quotes_file_count = search_dir_for_ext(work_area, "mq4", meta_quotes_files);
+	printf("Searching PATH for relevant files...\n");
+	pthread_t spinner_tid;
+    pthread_create(&spinner_tid, NULL, spinner_thread, NULL);
 
-	char additional_search_dirs[MAX_ARRAY_SIZE][MAX_TOKEN_SIZE] = {0};
-	int dlls_found = search_PATH_for_ext("dll", additional_search_dirs, available_dlls);
+		char meta_quotes_files[MAX_ARRAY_SIZE][MAX_TOKEN_SIZE] = {0};
+		int meta_quotes_file_count = search_dir_for_ext(work_area, "mq4", meta_quotes_files, true);
 
-	char default_header_location_arr[MAX_ARRAY_SIZE][MAX_TOKEN_SIZE];
-	strcpy(default_header_location_arr[0], default_header_location);
-	int headers_count = search_PATH_for_ext("mqh", default_header_location_arr, available_headers);
+		char additional_search_dirs[MAX_ARRAY_SIZE][MAX_TOKEN_SIZE] = {0};
+		int dlls_found = search_PATH_for_ext("dll", additional_search_dirs, available_dlls);
+
+		char default_header_location_arr[MAX_ARRAY_SIZE][MAX_TOKEN_SIZE];
+		strcpy(default_header_location_arr[0], default_header_location);
+		int headers_count = search_PATH_for_ext("mqh", default_header_location_arr, available_headers);
+
+	spinner_stop();
+	pthread_join(spinner_tid, NULL);
+	printf("Files found.\n");
 
 	char ordered_files[MAX_ARRAY_SIZE][MAX_TOKEN_SIZE] = {0};
 	int ordered_file_count = 0;

@@ -66,10 +66,10 @@ char *read_error_log(char *utf8_buffer) {
 			}
 			uint32_t codepoint = 0x10000 + (((ch - 0xD800) << 10) | (low - 0xDC00));
 			offset = append_utf8_char(utf8_buffer, offset, codepoint);
-		} 
+		}
 		else if (ch >= 0xDC00 && ch <= 0xDFFF) {  // Isolated low surrogate
 			printf("Isolated low surrogate detected.\n");
-		} 
+		}
 		else {
 			offset = append_utf8_char(utf8_buffer, offset, ch);
 		}
@@ -87,7 +87,7 @@ char *get_file_line(char *file, int iLine, char final_line[MAX_TOKEN_SIZE]) {
 
 	filePointer = fopen(file, "r");
 
-	if (filePointer == NULL) 
+	if (filePointer == NULL)
 		return "";
 
 	while(fgets(final_line, MAX_TOKEN_SIZE, filePointer)) {
@@ -105,16 +105,14 @@ char *get_file_line(char *file, int iLine, char final_line[MAX_TOKEN_SIZE]) {
 char *generate_error_indicator(char *original_text, char *result) {
 	char *text = strdup(original_text);
 	char *relevant_identifier = "";
-	if (strstr(text, ") : error")) {
+	if (strstr(text, ") : error"))
 		relevant_identifier = split_get_first_half(text, ") : error");
-	}
-	else if (strstr(text, ") : information")) {
+	else if (strstr(text, ") : information"))
 		relevant_identifier = split_get_first_half(text, ") : information");
-	}
-	else if (strstr(text, ") : warning")) {
+	else if (strstr(text, ") : warning"))
 		relevant_identifier = split_get_first_half(text, ") : warning");
-	}
 	else {
+		free(text);
 		return "";
 	}
 
@@ -129,12 +127,15 @@ char *generate_error_indicator(char *original_text, char *result) {
 
 	char *line_string = strdup(tokens_out[token_count - 2]);
 	token_count = split_string(line_string, '(', tokens_out);
+	char *old_line_string = line_string;
 	line_string = strdup(tokens_out[token_count - 1]);
+	free(old_line_string);
 	line_index = atoi(line_string);
 
 	file_name = split_get_first_half(relevant_identifier, "(");
 	if (file_name == NULL || line_index == 0 || char_index == 0) {
-		//printf("Err - unable to grab line num, index, or file name from error message.");
+		free(line_string);
+		free(text);
 		return "";
 	}
 
@@ -154,8 +155,10 @@ char *generate_error_indicator(char *original_text, char *result) {
 	whitespace[++whitespace_index] = '\n';
 	whitespace[++whitespace_index] = '\0';
 	snprintf(result, MAX_TOKEN_SIZE, "\n%s: %s\n%s", line_string, trim(target_line), whitespace);
-	return result;
 
+	free(text);
+	free(line_string);
+	return result;
 }
 
 char *colour_compiler_text(char *text, char *colour, char final_string[MAX_TOKEN_SIZE]) {

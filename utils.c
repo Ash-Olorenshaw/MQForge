@@ -87,7 +87,7 @@ char *extract_delimited_string(char *input, const char target_char) {
 char *trim_char(char *str, char target_char) {
 	char *ltrimmed = ltrim_char(str, target_char);
 	char *rtrimmed = rtrim_char(ltrimmed, target_char);
-	return rtrimmed; 
+	return rtrimmed;
 }
 
 char *ltrim(char *str) {
@@ -96,6 +96,8 @@ char *ltrim(char *str) {
 }
 
 char *rtrim(char *str) {
+	if (strlen(str) == 0)
+		return str;
 	char* back = str + strlen(str);
 	while(isspace(*--back));
 	*(back + 1) = '\0';
@@ -103,7 +105,7 @@ char *rtrim(char *str) {
 }
 
 char *trim(char *str) {
-	return rtrim(ltrim(str)); 
+	return rtrim(ltrim(str));
 }
 
 int string_occurences(char *str, char target_char) {
@@ -121,7 +123,7 @@ char *get_substring(char *str, int pos, int l, char *new_str) {
 		new_str[i] = str[pos + i];
 		i++;
 	}
-	new_str[i] = '\0';  
+	new_str[i] = '\0';
 
 	return new_str;
 }
@@ -140,7 +142,7 @@ int split_string(char *string_item, char delimiter, char tokens_out[MAX_ARRAY_SI
 
 	for (int i = 0; i < strlen(string_item); i++) {
 		char ch = string_item[i];
-		
+
 		if (ch == delimiter) {
 			strncpy(tokens_out[count], current_string, MAX_TOKEN_SIZE);
 			count++;

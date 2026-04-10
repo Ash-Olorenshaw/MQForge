@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "globals.h"
@@ -19,7 +20,7 @@ int get_dep_dict_size() {
 
 void print_deps(struct map_element_array dependency_dict[MAX_ARRAY_SIZE]) {
 	printf("{\n");
-	for (int i = 0; i < MAX_ARRAY_SIZE; i++) { 
+	for (int i = 0; i < MAX_ARRAY_SIZE; i++) {
 		if (dependency_dict[i].key != NULL) {
 			printf("\t\"%s\" : [", dependency_dict[i].key);
 			for (int j = 0; j < MAX_ARRAY_SIZE; j++) {
@@ -151,6 +152,7 @@ int create_file_order(char files[MAX_ARRAY_SIZE][MAX_TOKEN_SIZE], char dependenc
 							strcpy(dependency_dict[ifile].val[idep], dep);
 						}
 					}
+					free(dep);
 				}
 				dependency_dict[ifile].key = files[ifile];
 			}
