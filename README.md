@@ -4,7 +4,7 @@ alpha v0.0.1
 
 A tool for making compiling MetaQuotes files from the commandline using the MetaQuotes compiler `Meta Editor` easier!
 
-`MQForge` is designed for use with MQ4 code (should probably work with MQ5 too, but untested). It does *not* replace `Meta Editor` as compiler, it simply extends its functionality to make it easier to compile `.mq4` files from the commandline. 
+`MQForge` is designed for use with MQ4 code (should probably work with MQ5 too, but untested). It does *not* replace `Meta Editor` as compiler, it simply extends its functionality to make it easier to compile `.mq4` files from the commandline.
 
 
 ## Features
@@ -14,9 +14,9 @@ A tool for making compiling MetaQuotes files from the commandline using the Meta
 	![Coloured outputs](/Screenshots/main.png?raw=true "Coloured output example")
 - simplicity:
 	```bash
-	# instead of 
+	# instead of
  	/path/to/metaeditor.exe /compile:"file.mq4" /log:errors.log
- 
+
  	# simply run
  	MQForge
 
@@ -59,17 +59,17 @@ Further functionality does exist, and it can be seen through the help file, whic
 
     MQForge
 
-    OPTIONAL: 
+    OPTIONAL:
     [<filepath>]
 
-    REQUIRED: 
+    REQUIRED:
     [-me/--meta-editor]       -   Location for your metaeditor.exe file.
 
     OPTIONAL:
     [-h/--help]               -   print this helpfile
     [-v/--version]            -   print program version
     [-dh/--default-headers]   -   Location directory of standard .mqh header files (this is usually something like 'C:/users/USERNAME/AppData/Roaming/MetaQuotes/Terminal/USERID/MQL4/Include/').
-    [-wine/--use-wine]        -   (default: false) Whether to use Wine to run 'metaeditor.exe' - only available on Linux. 
+    [-wine/--use-wine]        -   (default: false) Whether to use Wine to run 'metaeditor.exe' - only available on Linux.
     [-clr/--colourful]        -   (default: true) Whether to provide a coloured output.
     [-se/--suppress-errors]   -   (default: false) Whether to suppress launch errors for metaeditor.exe (really only matters with Wine).
     [-path/--use-path]        -   (default: true) Whether to search your PATH for .ex4, .dll, and .mqh files.
@@ -122,15 +122,20 @@ cd MQForge
 cmake -DTARGET_PLATFORM=Linux -B build -S .
 
 # building for Windows:
-cmake -DTARGET_PLATFORM=Windows -B build -S . 
+cmake -DTARGET_PLATFORM=Windows -B build -S .
 
 # cd into build directory
-cd build 
+cd build
 
 # make the project
 make
 ```
 
 After these steps, you should either have a `MQForge` or `MQForge.exe` file in the build directory for your use!
+
+
+## Credits
+
+[cJSON](https://github.com/DaveGamble/cJSON) - used for JSON parsing, an excellent library!
 
 
