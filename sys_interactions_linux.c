@@ -4,7 +4,7 @@
 #include <string.h>
 #include <dirent.h>
 
-#include "utils.h"
+#include "utils/string.h"
 #include "globals.h"
 
 

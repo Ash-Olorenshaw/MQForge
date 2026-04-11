@@ -3,6 +3,8 @@
 #include <stdbool.h>
 #include <unistd.h>
 
+#include "../globals.h"
+
 bool running = false;
 
 void spinner_stop() {
@@ -57,5 +59,15 @@ void* spinner_thread(void* arg) {
 
 	printf("\r \n");
     return NULL;
+}
+
+void print_run_info() {
+	printf("Starting compile in %s with:\n", work_area);
+	printf("\t- meta_editor = '%s'\n", meta_editor);
+	printf("\t- default_header_location = '%s'\n", default_header_location);
+	printf("\t- use_wine = %s\n", use_wine ? "true" : "false");
+	printf("\t- colourful = %s\n", colourful ? "true" : "false");
+	printf("\t- suppress_launch_errors = %s\n", suppress_launch_errors ? "true" : "false");
+	printf("\t- use_PATH = %s\n", use_PATH ? "true" : "false");
 }
 

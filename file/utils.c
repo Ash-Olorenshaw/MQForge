@@ -6,13 +6,13 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "utils.h"
-#include "globals.h"
+#include "../utils/string.h"
+#include "../globals.h"
 
 #ifdef _WIN32
 #include "sys_interactions_windows.h"
 #else
-#include "sys_interactions_linux.h"
+#include "../sys_interactions_linux.h"
 #endif
 
 

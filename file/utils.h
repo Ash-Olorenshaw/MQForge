@@ -1,8 +1,8 @@
-#ifndef FILE_UTILS_H
-#define FILE_UTILS_H
+#ifndef __FILE_UTILS_H
+#define __FILE_UTILS_H
 
 #include <stdbool.h>
-#include "globals.h"
+#include "../globals.h"
 
 int is_directory(const char *path);
 bool file_exists(char *filename);

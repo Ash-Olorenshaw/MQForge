@@ -1,5 +1,5 @@
-#ifndef PATH_UTILS_H
-#define PATH_UTILS_H
+#ifndef __PATH_UTILS_H
+#define __PATH_UTILS_H
 
 #define CONFIG_VALUE 84
 #include "globals.h"

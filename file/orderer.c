@@ -2,10 +2,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "globals.h"
-#include "file_utils.h"
+#include "../utils/string.h"
+#include "../globals.h"
 #include "utils.h"
-#include "file_importer.h"
+#include "importer.h"
 
 
 int get_dep_dict_size() {
@@ -103,14 +103,10 @@ int get_dep_dict_item_by_key(char *key, char item[MAX_ARRAY_SIZE][MAX_TOKEN_SIZE
 }
 
 int delete_dep_dict_item_by_key(char *key) {
-	//printf("\tkey %s marked for deletion\n", key);
 	for (int i = 0; i < MAX_ARRAY_SIZE; i++) {
 		if (dependency_dict[i].key != NULL && strcmp(dependency_dict[i].key, "") != 0) {
-			//printf("\tkey %s...\n", dependency_dict[i].key);
 			if (strcmp(dependency_dict[i].key, key) == 0) {
-				//printf("\tfound key %s marked for deletion: %s\n", key, dependency_dict[i].key);
 				dependency_dict[i].key = NULL;
-				//printf("\tkey now: %s\n", dependency_dict[i].key);
 				for (int j = 0; j < MAX_ARRAY_SIZE; j++) {
 					if (dependency_dict[i].val[j] != NULL && strcmp(dependency_dict[i].val[j], "") != 0) {
 						strcpy(dependency_dict[i].val[j], "");
@@ -125,7 +121,6 @@ int delete_dep_dict_item_by_key(char *key) {
 }
 
 int create_file_order(char files[MAX_ARRAY_SIZE][MAX_TOKEN_SIZE], char dependency_tree[MAX_ARRAY_SIZE][MAX_TOKEN_SIZE], int *file_num) {
-	//printf("\trunning...\n");
 	int dependency_tree_ptr = 0;
 	int dependency_files = 0;
 	int final_success = 200;
@@ -166,8 +161,6 @@ int create_file_order(char files[MAX_ARRAY_SIZE][MAX_TOKEN_SIZE], char dependenc
 		return 400;
 	}
 
-	//printf("Established dependency tree for %d files...\n", dependency_files);
-
 	int prev_len = get_dep_dict_size() + 1;
 	int current_len;
 	printf("\nDependency/compile tree:\n");
@@ -206,9 +199,6 @@ int create_file_order(char files[MAX_ARRAY_SIZE][MAX_TOKEN_SIZE], char dependenc
 						break;
 					}
 				}
-			}
-			else {
-				//printf("\tfailed to get item by key %s\n", dependency_keys[i]);
 			}
 		}
 

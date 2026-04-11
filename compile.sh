@@ -3,12 +3,13 @@
 FLAGS=""
 FILES="
 utils/printer.c
+utils/string.c
+file/utils.c
+file/orderer.c
+file/importer.c
 globals.c
 cJSON.c
-utils.c
-file_utils.c
-file_orderer.c
-file_importer.c
+config.c
 compiler.c
 sys_interactions_linux.c"
 

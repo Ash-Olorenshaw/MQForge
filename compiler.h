@@ -1,5 +1,5 @@
-#ifndef COMPILER_H
-#define COMPILER_H
+#ifndef __COMPILER_H
+#define __COMPILER_H
 
 #include "globals.h"
 

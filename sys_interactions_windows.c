@@ -3,7 +3,7 @@
 #include <stdbool.h>
 #include <stdarg.h>
 
-#include "utils.h"
+#include "utils/string.h"
 #include "globals.h"
 
 int get_PATH(char final_PATH_elems[MAX_ARRAY_SIZE][MAX_TOKEN_SIZE]) {

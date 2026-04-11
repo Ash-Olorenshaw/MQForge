@@ -3,5 +3,6 @@
 
 void spinner_stop();
 void* spinner_thread(void* arg);
+void print_run_info();
 
 #endif

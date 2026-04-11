@@ -6,9 +6,7 @@
 #include <dirent.h>
 #include <sys/stat.h>
 
-#include "globals.h"
-
-
+#include "../globals.h"
 
 char *string_lower(char *str) {
 	for (int i = 0; str[i]; i++) {

@@ -1,8 +1,8 @@
-#ifndef UTILS_H
-#define UTILS_H
+#ifndef __UTILS_STRING_H
+#define __UTILS_STRING_H
 
 #include <stdbool.h>
-#include "globals.h"
+#include "../globals.h"
 
 char *string_lower(char *str);
 

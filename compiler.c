@@ -6,14 +6,8 @@
 #include <wchar.h>
 #include <stdint.h>
 
-#include "utils.h"
-#include "file_utils.h"
-
-#ifdef _WIN32
-#include "sys_interactions_windows.h"
-#else
-#include "sys_interactions_linux.h"
-#endif
+#include "utils/string.h"
+#include "file/utils.h"
 
 #define BOM_UTF16_LE 0xFFFE
 #define BOM_UTF16_BE 0xFEFF
