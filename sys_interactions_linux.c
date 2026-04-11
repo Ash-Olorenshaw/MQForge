@@ -24,7 +24,6 @@ int get_PATH(char final_PATH_elems[MAX_ARRAY_SIZE][MAX_TOKEN_SIZE]) {
 		}
 	}
 	final_PATH[MAX_PATH_LEN - 1] = '\0';
-
 	pclose(p);
 
 	split_string(final_PATH, ':', final_PATH_elems);

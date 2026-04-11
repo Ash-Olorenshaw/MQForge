@@ -11,9 +11,9 @@ int get_PATH(char final_PATH_elems[MAX_ARRAY_SIZE][MAX_TOKEN_SIZE]) {
 	int ch;
 	char final_PATH[MAX_PATH_LEN] = "";
 
-	p = popen("echo %PATH%","r");   
+	p = popen("echo %PATH%","r");
 	if( p == NULL) {
-		fprintf(stderr, "Err - Unable to access %PATH% skipping...\n");
+		fprintf(stderr, "Err - Unable to access %%PATH%% skipping...\n");
 		return 0;
 	}
 	while((ch = fgetc(p)) != EOF) {

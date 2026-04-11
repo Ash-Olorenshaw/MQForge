@@ -5,13 +5,13 @@
 #include <stdarg.h>
 #include <pthread.h>
 
-#include "basic_json_parse.h"
 #include "file_utils.h"
 #include "utils.h"
 #include "globals.h"
 #include "file_orderer.h"
 #include "compiler.h"
 #include "utils/printer.h"
+#include "cJSON.h"
 
 #define HELP_STRING "\nOPTIONAL:\n[<filepath>]\n\nREQUIRED:\n[-me/--meta-editor]\t-\tLocation for your metaeditor.exe file.\n\nOPTIONAL:\n[-h/--help]\t\t-\tprint this helpfile\n[-v/--version]\t\t-\tprint program version\n[-dh/--default-headers]\t-\tLocation directory of standard .mqh header files.\n[-wine/--use-wine]\t-\t(default: false) Whether to use Wine to run 'metaeditor.exe' - only available on Linux.\n[-clr/--colourful]\t-\t(default: true) Whether to provide a coloured output.\n[-se/--suppress-errors]\t-\t(default: false) Whether to suppress launch errors for metaeditor.exe (really only matters with Wine).\n[-path/--use-path]\t-\t(default: true) Whether to search your PATH for .ex4, .dll, and .mqh files.\n[-s/--alt-settings]\t-\tAlternate settings file as opposed to the default 'compiler_commands.json' file.\n\n"
 #define VERSION_STRING "MQForge v0.0.1\n"
@@ -47,43 +47,50 @@ int main(int argc, char *argv[]) {
 		arg_num++;
 	}
 
-	int json_size = 0;
-	struct mapElement json[MAX_JSON_KEYS];
+	char buffer[MAX_JSON_FILE_SIZE];
+	FILE *file_ptr = fopen(alt_settings_file, "r");
+	char line_items[MAX_TOKEN_SIZE][MAX_JSON_KEYS];
 
-	read_basic_json(alt_settings_file, &json_size, &json);
-	for (int i = 0; i < json_size; i++) {
-		char *key = json[i].key;
-		if (strcmp("meta_editor", key) == 0) {
-			if (string_to_bool(json[i].val) < 0) {
-				extract_delimited_string(meta_editor = json[i].val, '"');
-			}
-		}
-		else if (strcmp("default_header_location", key) == 0) {
-			if (string_to_bool(json[i].val) < 0) {
-				extract_delimited_string(default_header_location = json[i].val, '"');
-			}
-		}
-		else if (strcmp("use_wine", key) == 0) {
-			if (string_to_bool(json[i].val) > -1) {
-				use_wine = string_to_bool(json[i].val);
-			}
-		}
-		else if (strcmp("compiler_colours", key) == 0 || strcmp("compiler_colors", key) == 0) {
-			if (string_to_bool(json[i].val) > -1) {
-				colourful = string_to_bool(json[i].val);
-			}
-		}
-		else if (strcmp("suppress_errors", key) == 0) {
-			if (string_to_bool(json[i].val) > -1) {
-				suppress_launch_errors = string_to_bool(json[i].val);
-			}
-		}
-		else if (strcmp("use_path", key) == 0 || strcmp("use_PATH", key) == 0) {
-			if (string_to_bool(json[i].val) > -1) {
-				use_PATH = string_to_bool(json[i].val);
-			}
-		}
+	if (file_ptr) {
+		fread(buffer, MAX_JSON_FILE_SIZE, 1, file_ptr);
+		fclose(file_ptr);
 	}
+	else {
+		fprintf(stderr, "Err - file can't be opened: '%s' \n", alt_settings_file);
+		exit(1);
+	}
+
+	cJSON *data_json = cJSON_Parse(buffer);
+
+	cJSON *meta_editor_json = cJSON_GetObjectItemCaseSensitive(data_json, "meta_editor");
+	if (cJSON_IsString(meta_editor_json))
+		meta_editor = meta_editor_json->valuestring;
+
+	cJSON *default_header_location_json = cJSON_GetObjectItemCaseSensitive(data_json, "default_header_location");
+	if (cJSON_IsString(default_header_location_json))
+		default_header_location = default_header_location_json->valuestring;
+
+	cJSON *use_wine_json = cJSON_GetObjectItemCaseSensitive(data_json, "use_wine");
+	if (cJSON_IsBool(use_wine_json))
+		use_wine = use_wine_json->valueint;
+
+	cJSON *compiler_colors_json = cJSON_GetObjectItemCaseSensitive(data_json, "compiler_colors");
+	cJSON *compiler_colours_json = cJSON_GetObjectItemCaseSensitive(data_json, "compiler_colours");
+	if (cJSON_IsBool(compiler_colors_json))
+		colourful = compiler_colors_json->valueint;
+	else if (cJSON_IsBool(compiler_colours_json))
+		colourful = compiler_colours_json->valueint;
+
+	cJSON *suppress_launch_errors_json = cJSON_GetObjectItemCaseSensitive(data_json, "suppress_errors");
+	if (cJSON_IsBool(suppress_launch_errors_json))
+		suppress_launch_errors = suppress_launch_errors_json->valueint;
+
+	cJSON *use_path_json = cJSON_GetObjectItemCaseSensitive(data_json, "use_path");
+	cJSON *use_PATH_json = cJSON_GetObjectItemCaseSensitive(data_json, "use_PATH");
+	if (cJSON_IsBool(use_path_json))
+		use_PATH = use_path_json->valueint;
+	else if (cJSON_IsBool(use_PATH_json))
+		use_PATH = use_PATH_json->valueint;
 
 	for (; arg_num < argc; arg_num++) {
 		if (check_arg_equals(argv[arg_num], "-me", "--meta-editor", NULL))
@@ -204,10 +211,10 @@ int main(int argc, char *argv[]) {
 
 	int success = create_file_order(meta_quotes_files, ordered_files, &ordered_file_count);
 	compile_files(ordered_files, ordered_file_count);
-	if (file_exists("errors.log")) {
+	if (file_exists("errors.log"))
 		remove("errors.log");
-	}
 
+	cJSON_Delete(data_json);
 	return 0;
 }
 

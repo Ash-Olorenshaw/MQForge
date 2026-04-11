@@ -4,8 +4,8 @@ FLAGS=""
 FILES="
 utils/printer.c
 globals.c
+cJSON.c
 utils.c
-basic_json_parse.c
 file_utils.c
 file_orderer.c
 file_importer.c

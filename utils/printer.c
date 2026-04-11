@@ -13,7 +13,6 @@ void* spinner_thread(void* arg) {
 	running = true;
 	int state = 0;
 
-	printf("\n");
 	while (running) {
 		printf("\r");
 		switch (state) {
@@ -56,7 +55,7 @@ void* spinner_thread(void* arg) {
 		fflush(stdout);
 	}
 
-	printf("\n");
+	printf("\r \n");
     return NULL;
 }
 

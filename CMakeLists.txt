@@ -11,9 +11,10 @@ if(TARGET_PLATFORM STREQUAL "Windows")
 
 	add_executable(compiler
 		globals.c
+		utils/printer.c
 		main.c
 		utils.c
-		basic_json_parse.c
+		cJSON.c
 		file_utils.c
 		file_orderer.c
 		file_importer.c
@@ -33,9 +34,10 @@ elseif(TARGET_PLATFORM STREQUAL "Linux")
 
 	add_executable(compiler
 		globals.c
+		utils/printer.c
 		main.c
 		utils.c
-		basic_json_parse.c
+		cJSON.c
 		file_utils.c
 		file_orderer.c
 		file_importer.c
