@@ -6,12 +6,11 @@
 #include <pthread.h>
 
 #include "file/utils.h"
-#include "globals.h"
 #include "file/orderer.h"
-#include "compiler.h"
 #include "utils/printer.h"
 #include "utils/string.h"
-#include "cJSON.h"
+#include "globals.h"
+#include "compiler.h"
 #include "config.h"
 
 #ifdef _WIN32
@@ -22,38 +21,8 @@
 // cmake -DTARGET_PLATFORM=Linux -B build -S . && cd build && make && cd ..
 
 int main(int argc, char *argv[]) {
-	for (int i = 0; i < argc; i++) {
-		if (check_arg_equals(argv[i], "-h", "--help", NULL)) {
-			printf(VERSION_STRING);
-			printf(HELP_STRING);
-			return 0;
-		}
-
-		else if (check_arg_equals(argv[i], "-v", "--version", NULL)) {
-			printf(VERSION_STRING);
-			return 0;
-		}
-
-		else if (check_arg_equals(argv[i], "-s", "--alt-settings", NULL)) {
-			strcpy(alt_settings_file, argv[i + 1]);
-		}
-	}
-
-	char buffer[MAX_JSON_FILE_SIZE];
-	FILE *file_ptr = fopen(alt_settings_file, "r");
-	char line_items[MAX_TOKEN_SIZE][MAX_JSON_KEYS];
-
-	if (file_ptr) {
-		fread(buffer, MAX_JSON_FILE_SIZE, 1, file_ptr);
-		fclose(file_ptr);
-	}
-	else {
-		fprintf(stderr, "Err - file can't be opened: '%s' \n", alt_settings_file);
-		exit(1);
-	}
-
-	cJSON *data_json = cJSON_Parse(buffer);
-	process_json_config(data_json);
+	process_core_flags(argc, argv);
+	process_json_config();
 	process_command_flags(argc, argv);
 
 	if (meta_editor == NULL || strcmp(meta_editor, "") == 0) {
@@ -96,7 +65,6 @@ int main(int argc, char *argv[]) {
 	if (file_exists("errors.log"))
 		remove("errors.log");
 
-	cJSON_Delete(data_json);
 	return 0;
 }
 

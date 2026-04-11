@@ -5,8 +5,9 @@ FILES="
 utils/printer.c
 utils/string.c
 file/utils.c
-file/orderer.c
 file/importer.c
+file/orderer.c
+file/dependencies.c
 globals.c
 cJSON.c
 config.c

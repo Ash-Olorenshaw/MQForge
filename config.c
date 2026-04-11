@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
 
 #include "file/utils.h"
@@ -6,14 +7,53 @@
 #include "globals.h"
 #include "cJSON.h"
 
-void process_json_config(cJSON *data_json) {
+void process_core_flags(int argc, char *argv[]) {
+	for (int i = 0; i < argc; i++) {
+		if (check_arg_equals(argv[i], "-h", "--help", NULL)) {
+			printf(VERSION_STRING);
+			printf(HELP_STRING);
+			exit(0);
+		}
+
+		else if (check_arg_equals(argv[i], "-v", "--version", NULL)) {
+			printf(VERSION_STRING);
+			exit(0);
+		}
+
+		else if (check_arg_equals(argv[i], "-s", "--alt-settings", NULL)) {
+			if (i + 1 < argc) {
+				strcpy(alt_settings_file, argv[i + 1]);
+			}
+			else {
+				printf("Err - '--alt-settings' flag must provide a string pointing to the alternate settings file.\n");
+				exit(1);
+			}
+		}
+	}
+}
+
+void process_json_config() {
+	char buffer[MAX_JSON_FILE_SIZE];
+	FILE *file_ptr = fopen(alt_settings_file, "r");
+	char line_items[MAX_TOKEN_SIZE][MAX_JSON_KEYS];
+
+	if (file_ptr) {
+		fread(buffer, MAX_JSON_FILE_SIZE, 1, file_ptr);
+		fclose(file_ptr);
+	}
+	else {
+		fprintf(stderr, "Err - file can't be opened: '%s' \n", alt_settings_file);
+		exit(1);
+	}
+
+	cJSON *data_json = cJSON_Parse(buffer);
 	cJSON *meta_editor_json = cJSON_GetObjectItemCaseSensitive(data_json, "meta_editor");
 	if (cJSON_IsString(meta_editor_json))
-		meta_editor = meta_editor_json->valuestring;
+		meta_editor = strdup(meta_editor_json->valuestring);
 
 	cJSON *default_header_location_json = cJSON_GetObjectItemCaseSensitive(data_json, "default_header_location");
 	if (cJSON_IsString(default_header_location_json))
-		default_header_location = default_header_location_json->valuestring;
+		default_header_location = strdup(default_header_location_json->valuestring);
 
 	cJSON *use_wine_json = cJSON_GetObjectItemCaseSensitive(data_json, "use_wine");
 	if (cJSON_IsBool(use_wine_json))
@@ -36,6 +76,8 @@ void process_json_config(cJSON *data_json) {
 		use_PATH = use_path_json->valueint;
 	else if (cJSON_IsBool(use_PATH_json))
 		use_PATH = use_PATH_json->valueint;
+
+	cJSON_Delete(data_json);
 }
 
 void process_command_flags(int argc, char *argv[]) {

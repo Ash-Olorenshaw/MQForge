@@ -83,7 +83,6 @@ int search_dir_for_ext(const char *target_path, const char *extension, char file
 		if (splits > 0 && files_found < MAX_ARRAY_SIZE) {
 			if (strcmp(lines[splits - 1], extension) == 0) {
 				strcpy(files[files_found++], all_files[i]);
-				// printf("Searching file %s\n", files[files_found]);
 			}
 		}
 	}
@@ -111,7 +110,6 @@ int search_PATH_for_ext(const char *extension, char additional_dirs[MAX_ARRAY_SI
 	int insertion_ptr = current_files_found;
 	for (int idir = 0; idir < all_dirs_index + 1; idir++) {
 		char new_dir_files[MAX_ARRAY_SIZE][MAX_TOKEN_SIZE] = {0};
-		// printf("Searching directory %s for extension %s\n", all_dirs[idir], extension);
 		int new_files_found = search_dir_for_ext(all_dirs[idir], extension, files, false);
 		if (new_files_found + insertion_ptr < MAX_ARRAY_SIZE) {
 			memcpy(files + insertion_ptr, new_dir_files, new_files_found * sizeof(char *));
