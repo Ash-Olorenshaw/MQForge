@@ -1,0 +1,60 @@
+#if 0
+	printf "BUILDING SCRIPT...\n"
+    gcc "$0" \
+		./build_scripts/utils.c ./build_scripts/args.c \
+		-o ./.temp-run \
+		-Wall -Wextra -pedantic
+	printf "\n"
+	./.temp-run "$@"
+    rm -f ./.temp-run
+    exit
+#endif
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+
+#include "build_scripts/utils.h"
+#include "build_scripts/args.h"
+
+#define BUILD_FILES "main.c", \
+	"utils/printer.c", \
+	"utils/string.c", \
+	"file/utils.c", \
+	"file/importer.c", \
+	"file/orderer.c", \
+	"file/dependencies.c", \
+	"globals.c", \
+	"cJSON.c", \
+	"config.c", \
+	"compiler.c", \
+	"sys_interactions_linux.c"
+#define OUTPUT_FILE "./MQForge"
+#define BUILD_ARGS "-Wall", "-Wextra", "-pedantic"
+#define DEBUG_ARGS "-g", "-fsanitize=address", "-fno-omit-frame-pointer"
+
+
+int main(int argv, const char **argc) {
+	args arguments = { .arg_count = argv, .args = argc };
+	char *output_file_name = arg_pos("windows", arguments) == -1 ? OUTPUT_FILE : (OUTPUT_FILE".exe");
+
+	char *build_args[] = {
+		arg_pos("windows", arguments) == -1 ? "gcc" : "x86_64-w64-mingw32-gcc",
+		BUILD_FILES,
+		"-o",
+		output_file_name,
+		BUILD_ARGS,
+		arg_pos("debug", arguments) != -1 ? DEBUG_ARGS : NULL,
+		NULL
+	};
+
+	int time = run_command(build_args, ".", false);
+	printf("Build finished in %d seconds.", time);
+
+	if (arg_pos("run", arguments) != -1) {
+		char *run_args[] = { output_file_name, NULL };
+		run_command(run_args, ".", false);
+	}
+}
+

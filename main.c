@@ -8,7 +8,6 @@
 #include "file/utils.h"
 #include "file/orderer.h"
 #include "utils/printer.h"
-#include "utils/string.h"
 #include "globals.h"
 #include "compiler.h"
 #include "config.h"
@@ -18,7 +17,6 @@
 #else
 #include "sys_interactions_linux.h"
 #endif
-// cmake -DTARGET_PLATFORM=Linux -B build -S . && cd build && make && cd ..
 
 int main(int argc, char *argv[]) {
 	process_core_flags(argc, argv);
@@ -60,7 +58,7 @@ int main(int argc, char *argv[]) {
 	char ordered_files[MAX_ARRAY_SIZE][MAX_TOKEN_SIZE] = {0};
 	int ordered_file_count = 0;
 
-	int success = create_file_order(meta_quotes_files, ordered_files, &ordered_file_count);
+	create_file_order(meta_quotes_files, ordered_files, &ordered_file_count);
 	compile_files(ordered_files, ordered_file_count);
 	if (file_exists("errors.log"))
 		remove("errors.log");

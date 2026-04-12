@@ -7,6 +7,8 @@ CMakeCache.txt
 CMakeFiles/*
 build/*
 .cache/*
+MQForge
+MQForge.exe
 
 
 # my real forge_commands.json
