@@ -23,8 +23,10 @@ array *assemble_compile_order(array **ordered_files) {
 
 	if (target_files == NULL)
 		search_dir_for_ext(work_area, "mq4", meta_quotes_files, true);
-	else
+	else {
+		free_array(&meta_quotes_files);
 		meta_quotes_files = target_files;
+	}
 
 	search_PATH_for_ext("dll", additional_search_dirs, &available_dlls);
 	search_PATH_for_ext("mqh", default_header_location_arr, &available_headers);
