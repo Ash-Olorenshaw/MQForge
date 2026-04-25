@@ -1,8 +1,8 @@
 #ifndef __FILE_ORDERER_H
 #define __FILE_ORDERER_H
 
-#include "../globals.h"
+#include "../array.h"
 
-int create_file_order(char files[MAX_ARRAY_SIZE][MAX_TOKEN_SIZE], char dependency_tree[MAX_ARRAY_SIZE][MAX_TOKEN_SIZE], int *file_num);
+int create_file_order(array *files, array **dependency_tree, int *file_num, array * available_dlls, array *available_headers);
 
 #endif

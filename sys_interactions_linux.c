@@ -8,7 +8,7 @@
 #include "globals.h"
 
 
-int get_PATH(char final_PATH_elems[MAX_ARRAY_SIZE][MAX_TOKEN_SIZE]) {
+int get_PATH(array *final_PATH_elems) {
 	FILE *p;
 	int ch;
 	char final_PATH[MAX_PATH_LEN] = "";

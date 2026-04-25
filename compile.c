@@ -3,7 +3,8 @@
     gcc "$0" \
 		./build_scripts/utils.c ./build_scripts/args.c \
 		-o ./.temp-run \
-		-Wall -Wextra -pedantic
+		-Wall -Wextra -pedantic \
+		-g -fsanitize=address -fno-omit-frame-pointer
 	printf "\n"
 	./.temp-run "$@"
     rm -f ./.temp-run
@@ -25,6 +26,8 @@
 	"file/importer.c", \
 	"file/orderer.c", \
 	"file/dependencies.c", \
+	"file/main.c", \
+	"array.c", \
 	"globals.c", \
 	"cJSON.c", \
 	"config.c", \
@@ -32,25 +35,31 @@
 	"sys_interactions_linux.c"
 #define OUTPUT_FILE "./MQForge"
 #define BUILD_ARGS "-Wall", "-Wextra", "-pedantic"
-#define DEBUG_ARGS "-g", "-fsanitize=address", "-fno-omit-frame-pointer"
-
 
 int main(int argv, const char **argc) {
 	args arguments = { .arg_count = argv, .args = argc };
 	char *output_file_name = arg_pos("windows", arguments) == -1 ? OUTPUT_FILE : (OUTPUT_FILE".exe");
 
-	char *build_args[] = {
+	char** debug_args = (char**) ARR_CREATE("-g", "-fsanitize=address", "-fno-omit-frame-pointer" );
+	char **build_args = (char**) ARR_CREATE(
 		arg_pos("windows", arguments) == -1 ? "gcc" : "x86_64-w64-mingw32-gcc",
 		BUILD_FILES,
 		"-o",
 		output_file_name,
-		BUILD_ARGS,
-		arg_pos("debug", arguments) != -1 ? DEBUG_ARGS : NULL,
-		NULL
-	};
+		BUILD_ARGS
+	);
+
+	if (arg_pos("debug", arguments) != -1) {
+		char **new_build_args = (char **) array_cat((void**) build_args, (void**) debug_args);
+		free(build_args);
+		build_args = new_build_args;
+
+	}
 
 	int time = run_command(build_args, ".", false);
-	printf("Build finished in %d seconds.", time);
+	printf("Build finished in %d seconds. DEBUG: '%s'\n", time, arg_pos("debug", arguments) != -1 ? "true" : "false");
+	free(build_args);
+	free(debug_args);
 
 	if (arg_pos("run", arguments) != -1) {
 		char *run_args[] = { output_file_name, NULL };

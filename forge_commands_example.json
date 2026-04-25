@@ -4,5 +4,6 @@
 	"use_wine" : false,
 	"compiler_colours" : true,
 	"suppress_errors" : false,
-	"use_path" : true
+	"use_path" : true,
+	"target" : "*"
 }

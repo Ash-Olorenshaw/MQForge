@@ -1,9 +1,8 @@
-#include <stdbool.h>
+#include <stdlib.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
-#include <dirent.h>
 #include <sys/stat.h>
 
 #include "../globals.h"
@@ -113,48 +112,57 @@ int string_occurences(char *str, char target_char) {
 	return count;
 }
 
-char *get_substring(char *str, int pos, int l, char *new_str) {
-	int i = 0;
-	int str_len = strlen(str);
+char *get_substring(const char *str, int start, int end) {
+	if (str == NULL || start < 0 || end < 0 || start >= end)
+		return NULL;
 
-	while (i < l && i < str_len) {
-		new_str[i] = str[pos + i];
-		i++;
-	}
-	new_str[i] = '\0';
+	int len = strlen(str);
 
-	return new_str;
+	if (start >= len) return strdup("");
+	if (end > len) end = len;
+
+	int sublen = end - start;
+    char *result = malloc(sublen + 1);
+
+    if (!result) return NULL;
+
+    memcpy(result, str + start, sublen);
+    result[sublen] = '\0';
+	return result;
 }
 
-bool value_in_string_array(char val[MAX_TOKEN_SIZE], char arr[MAX_ARRAY_SIZE][MAX_TOKEN_SIZE], int n) {
+bool value_in_string_array(char val[MAX_TOKEN_SIZE], array * arr, int n) {
 	for (int i = 0; i < n; i++) {
-		if (strcmp(arr[i], val) == 0)
+		if (strcmp(arr->array[i], val) == 0 && i < arr->size)
 			return true;
 	}
 	return false;
 }
 
-int split_string(char *string_item, char delimiter, char tokens_out[MAX_ARRAY_SIZE][MAX_TOKEN_SIZE]) {
-	char current_string[MAX_TOKEN_SIZE] = "";
-	int count = 0;
+int split_string(char *string_item, char delimiter, array *tokens_out) {
+	if (string_item == NULL) {
+		tokens_out->array[0] = NULL;
+		return 0;
+	}
 
-	for (int i = 0; i < strlen(string_item); i++) {
+	char current_string[MAX_TOKEN_SIZE] = "";
+	int string_len = strlen(string_item);
+
+	for (int i = 0; i < string_len && tokens_out->count < tokens_out->size; i++) {
 		char ch = string_item[i];
 
 		if (ch == delimiter) {
-			strncpy(tokens_out[count], current_string, MAX_TOKEN_SIZE);
-			count++;
+			tokens_out->array[tokens_out->count++] = strdup(current_string);
 			memset(current_string, 0, sizeof(current_string));
 		}
-		else if (i == (strlen(string_item) - 1)) {
+		else if (i == (string_len - 1)) {
 			if (strlen(current_string) > MAX_TOKEN_SIZE - 1) {
 				fprintf(stderr, "Err - String %s exceeded expected token size of %d when splitting...\n", string_item, MAX_TOKEN_SIZE);
 				return 400;
 			}
 			current_string[strlen(current_string)] = ch;
 			current_string[strlen(current_string) + 1] = '\0';
-			strncpy(tokens_out[count], current_string, MAX_TOKEN_SIZE);
-			count++;
+			tokens_out->array[tokens_out->count++] = strdup(current_string);
 			memset(current_string, 0, sizeof(current_string));
 		}
 		else {
@@ -162,7 +170,7 @@ int split_string(char *string_item, char delimiter, char tokens_out[MAX_ARRAY_SI
 			current_string[strlen(current_string) + 1] = '\0';
 		}
 	}
-	return count;
+	return tokens_out->count;
 }
 
 char *split_get_second_half(char *str, const char *delim) {

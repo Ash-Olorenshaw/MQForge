@@ -3,6 +3,11 @@
 
 #include "../globals.h"
 
-int check_file_deps(char file[MAX_TOKEN_SIZE], char import_items[MAX_ARRAY_SIZE][MAX_TOKEN_SIZE]);
+int check_file_deps(
+	char file[MAX_TOKEN_SIZE],
+	array *import_items,
+	array *available_dlls,
+	array *available_headers
+);
 
 #endif

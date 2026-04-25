@@ -78,3 +78,24 @@ double run_command(char *const args[], const char *dir, bool no_stdout) {
 	return 0;
 }
 
+void **array_cat(void **dest, void **src) {
+	int dest_current = 0;
+	while (dest[dest_current++] != NULL) {}
+
+	int src_current = 0;
+	while (src[src_current++] != NULL) {}
+
+	void **new_array = malloc(dest_current * src_current * sizeof(void*));
+
+	int current = 0;
+	dest_current = 0;
+	src_current = 0;
+
+	while (dest[dest_current] != NULL)
+		new_array[current++] = dest[dest_current++];
+	while (src[src_current] != NULL)
+		new_array[current++] = src[src_current++];
+
+	new_array[current] = NULL;
+	return new_array;
+}

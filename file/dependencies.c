@@ -3,18 +3,24 @@
 
 #include "../utils/string.h"
 #include "../globals.h"
+#include "./dependencies.h"
+
+map_element_array dependency_dict[MAX_ARRAY_SIZE] = {0};
+
+map_element_array *get_dep_dict() {
+	return dependency_dict;
+}
 
 int get_dep_dict_size() {
 	int size = 0;
 	for (int i = 0; i < MAX_ARRAY_SIZE; i++) {
-		if (dependency_dict[i].key != NULL && strcmp(dependency_dict[i].key, "") != 0) {
+		if (dependency_dict[i].key != NULL && !string_isspace(dependency_dict[i].key))
 			size++;
-		}
 	}
 	return size;
 }
 
-void print_deps(struct map_element_array dependency_dict[MAX_ARRAY_SIZE]) {
+void print_deps(map_element_array dependency_dict[MAX_ARRAY_SIZE]) {
 	printf("{\n");
 	for (int i = 0; i < MAX_ARRAY_SIZE; i++) {
 		if (dependency_dict[i].key != NULL) {
@@ -30,17 +36,16 @@ void print_deps(struct map_element_array dependency_dict[MAX_ARRAY_SIZE]) {
 	printf("}\n");
 }
 
-bool check_deps_satisfied(char target_deps[MAX_ARRAY_SIZE][MAX_TOKEN_SIZE], char dependency_keys[MAX_ARRAY_SIZE][MAX_TOKEN_SIZE], char unresolved_dependencies[MAX_ARRAY_SIZE][MAX_TOKEN_SIZE]) {
+bool check_deps_satisfied(array *target_deps, array *dependency_keys, array *unresolved_dependencies) {
 	int found = 1;
-	int final_ptr = 0;
 	bool any_key_present;
-	for (int i = 0; i < MAX_ARRAY_SIZE; i++) {
-		if (target_deps[i] != NULL && strcmp(target_deps[i], "") != 0) {
+	for (int i = 0; i < target_deps->count; i++) {
+		if (strcmp(target_deps->array[i], "") != 0) {
 			found++;
 			any_key_present = false;
-			for (int j = 0; j < MAX_ARRAY_SIZE; j++) {
-				if (dependency_keys[j] != NULL && strcmp(dependency_keys[j], "") != 0) {
-					if (strcmp(dependency_keys[j], target_deps[i]) == 0) {
+			for (int j = 0; j < dependency_keys->count; j++) {
+				if (strcmp(dependency_keys->array[j], "") != 0) {
+					if (strcmp(dependency_keys->array[j], target_deps->array[i]) == 0) {
 						any_key_present = true;
 						found--;
 					}
@@ -48,42 +53,42 @@ bool check_deps_satisfied(char target_deps[MAX_ARRAY_SIZE][MAX_TOKEN_SIZE], char
 			}
 
 			if (!any_key_present)
-				strcpy(unresolved_dependencies[final_ptr++], target_deps[i]);
+				unresolved_dependencies->array[unresolved_dependencies->count++] = strdup(target_deps->array[i]);
 		}
 	}
 
 	return found == 1;
 }
 
-int get_dep_dict_keys(char dependency_keys[MAX_ARRAY_SIZE][MAX_TOKEN_SIZE]) {
-	int index = 0;
+int get_dep_dict_keys(array *dependency_keys) {
+	dependency_keys->count = 0;
 	for (int i = 0; i < MAX_ARRAY_SIZE; i++) {
 		if (dependency_dict[i].key != NULL && strcmp(dependency_dict[i].key, "") != 0) {
-			strcpy(dependency_keys[index++], dependency_dict[i].key);
+			dependency_keys->array[dependency_keys->count++] = strdup(dependency_dict[i].key);
 		}
 	}
-	return index;
+	return dependency_keys->count;
 }
 
 
-void change_deps_extensions(char dependencies[MAX_ARRAY_SIZE][MAX_TOKEN_SIZE]) {
-	for (int i = 0; i < MAX_ARRAY_SIZE; i++) {
-		if (dependencies[i] != NULL && strcmp(dependencies[i], "") != 0) {
-			char *new_str = replace_str_ending(dependencies[i], ".ex4");
-			strcpy(dependencies[i], new_str);
-		}
+void change_deps_extensions(array *dependencies) {
+	char *dep;
+	int i;
+	ARRAY_FOREACH(dep, dependencies, i) {
+		if (strcmp(dep, "") != 0)
+			dep = replace_str_ending(dep, ".ex4");
 	}
 }
 
 
-int get_dep_dict_item_by_key(char *key, char item[MAX_ARRAY_SIZE][MAX_TOKEN_SIZE]) {
+int get_dep_dict_item_by_key(char *key, array *item) {
 	for (int i = 0; i < MAX_ARRAY_SIZE; i++) {
 		if (dependency_dict[i].key != NULL && strcmp(dependency_dict[i].key, "") != 0) {
 			if (strcmp(dependency_dict[i].key, key) == 0) {
 				for (int j = 0; j < MAX_ARRAY_SIZE; j++) {
-					strcpy(item[j], dependency_dict[i].val[j]);
+					if (dependency_dict[i].val[j] != NULL && !string_isspace(dependency_dict[i].val[j]))
+						item->array[item->count++] = strdup(dependency_dict[i].val[j]);
 				}
-
 				return 200;
 			}
 		}

@@ -114,15 +114,15 @@ char *generate_error_indicator(char *original_text, char *result) {
 	int line_index = 0;
 	char *file_name = "";
 
-	char tokens_out[MAX_ARRAY_SIZE][MAX_TOKEN_SIZE];
+	array *tokens_out = NEW_ARRAY(MAX_ARRAY_SIZE);
 	int token_count = split_string(relevant_identifier, ',', tokens_out);
-	char *char_string = tokens_out[token_count - 1];
+	char *char_string = tokens_out->array[token_count - 1];
 	char_index = atoi(char_string);
 
-	char *line_string = strdup(tokens_out[token_count - 2]);
+	char *line_string = strdup(tokens_out->array[token_count - 2]);
 	token_count = split_string(line_string, '(', tokens_out);
 	char *old_line_string = line_string;
-	line_string = strdup(tokens_out[token_count - 1]);
+	line_string = strdup(tokens_out->array[token_count - 1]);
 	free(old_line_string);
 	line_index = atoi(line_string);
 
@@ -150,6 +150,7 @@ char *generate_error_indicator(char *original_text, char *result) {
 	whitespace[++whitespace_index] = '\0';
 	snprintf(result, MAX_TOKEN_SIZE, "\n%s: %s\n%s", line_string, trim(target_line), whitespace);
 
+	free_array(&tokens_out);
 	free(text);
 	free(line_string);
 	return result;
@@ -244,22 +245,25 @@ int compile_file(char target_file[MAX_TOKEN_SIZE]) {
 
 	char file_data[MAX_TOKEN_SIZE * MAX_ARRAY_SIZE];
 	read_error_log(file_data);
-	char lines[MAX_ARRAY_SIZE][MAX_TOKEN_SIZE];
+	array *lines = NEW_ARRAY(MAX_ARRAY_SIZE);
 	int lines_len = split_string(file_data, '\n', lines);
 	for (int i = 1; i < lines_len; i++) {
-		if (!string_isspace(lines[i])) {
+		if (!string_isspace(lines->array[i])) {
 			char final_line[MAX_TOKEN_SIZE];
-			printf("%s\n", colour_compiler_text(trim(lines[i]), NULL, final_line));
+			printf("%s\n", colour_compiler_text(trim(lines->array[i]), NULL, final_line));
 		}
 	}
 
+	free_array(&lines);
 	return 200;
 }
 
-void compile_files(char target_files[MAX_ARRAY_SIZE][MAX_TOKEN_SIZE], int file_num) {
+void compile_files(array *target_files) {
 	int success;
-	for (int i = 0; i < file_num; i++) {
-		success = compile_file(target_files[i]);
+	int i = 0;
+	char *file;
+	ARRAY_FOREACH(file, target_files, i) {
+		success = compile_file(file);
 		if (success == 400)
 			return;
 	}

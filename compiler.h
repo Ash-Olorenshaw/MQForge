@@ -1,8 +1,8 @@
 #ifndef __COMPILER_H
 #define __COMPILER_H
 
-#include "globals.h"
+#include "array.h"
 
-int compile_files(char target_files[MAX_ARRAY_SIZE][MAX_TOKEN_SIZE], int file_num);
+int compile_files(array *target_files);
 
 #endif

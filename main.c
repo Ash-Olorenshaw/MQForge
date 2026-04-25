@@ -1,12 +1,9 @@
 #include <stdio.h>
-#include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdarg.h>
-#include <pthread.h>
 
 #include "file/utils.h"
-#include "file/orderer.h"
+#include "file/main.h"
 #include "utils/printer.h"
 #include "globals.h"
 #include "compiler.h"
@@ -29,39 +26,22 @@ int main(int argc, char *argv[]) {
 	}
 
 	if ((strcmp(OS_NAME, "Linux") == 0 && alt_settings_file[0] != '/') || (strcmp(OS_NAME, "Windows") == 0 && alt_settings_file[1] != ':')) {
-		char relative_settings_file[MAX_TOKEN_SIZE];
+		char *relative_settings_file = malloc(strlen(work_area) + 1 + strlen(alt_settings_file) + 1);
 		strcpy(relative_settings_file, work_area);
 		strcat(relative_settings_file, "/");
 		strcat(relative_settings_file, alt_settings_file);
 		strcpy(alt_settings_file, relative_settings_file);
+		free(relative_settings_file);
 	}
 
 	print_run_info();
-	printf("Searching PATH for relevant files...\n");
-	pthread_t spinner_tid;
-    pthread_create(&spinner_tid, NULL, spinner_thread, NULL);
 
-		char meta_quotes_files[MAX_ARRAY_SIZE][MAX_TOKEN_SIZE] = {0};
-		int meta_quotes_file_count = search_dir_for_ext(work_area, "mq4", meta_quotes_files, true);
+	array *ordered_files = NEW_ARRAY(MAX_ARRAY_SIZE);
+	compile_files(assemble_compile_order(&ordered_files));
 
-		char additional_search_dirs[MAX_ARRAY_SIZE][MAX_TOKEN_SIZE] = {0};
-		int dlls_found = search_PATH_for_ext("dll", additional_search_dirs, available_dlls);
-
-		char default_header_location_arr[MAX_ARRAY_SIZE][MAX_TOKEN_SIZE];
-		strcpy(default_header_location_arr[0], default_header_location);
-		int headers_count = search_PATH_for_ext("mqh", default_header_location_arr, available_headers);
-
-	spinner_stop();
-	pthread_join(spinner_tid, NULL);
-	printf("Files found.\n");
-
-	char ordered_files[MAX_ARRAY_SIZE][MAX_TOKEN_SIZE] = {0};
-	int ordered_file_count = 0;
-
-	create_file_order(meta_quotes_files, ordered_files, &ordered_file_count);
-	compile_files(ordered_files, ordered_file_count);
 	if (file_exists("errors.log"))
 		remove("errors.log");
+	free_array(&ordered_files);
 
 	return 0;
 }

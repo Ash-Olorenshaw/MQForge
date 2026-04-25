@@ -4,7 +4,12 @@
 #include "../globals.h"
 #include "../utils/string.h"
 
-int check_file_deps(char file[MAX_TOKEN_SIZE], char import_items[MAX_ARRAY_SIZE][MAX_TOKEN_SIZE]) {
+int check_file_deps(
+		char file[MAX_TOKEN_SIZE],
+		array *import_items,
+		array *available_dlls,
+		array *available_headers
+	) {
 	char buffer[MAX_TOKEN_SIZE];
 	FILE* filePointer;
 	int line_num = 0;
@@ -22,16 +27,18 @@ int check_file_deps(char file[MAX_TOKEN_SIZE], char import_items[MAX_ARRAY_SIZE]
 		trim(buffer);
 		buffer_copy = strdup(buffer);
 
-		char substring[MAX_TOKEN_SIZE] = {0};
-		if (strcmp(get_substring(buffer, 0, 7, substring), "#import") == 0) {
-			if (string_occurences(get_substring(buffer, 7, strlen(buffer) - 1, substring), '<') < 1 && string_occurences(get_substring(buffer, 7, strlen(buffer) - 1, substring), '>') < 1) {
-				char *import_item = strdup(extract_delimited_string(trim(get_substring(buffer_copy, 7, strlen(buffer) - 1, substring)), '"'));
+		char *substr = get_substring(buffer, 0, 7);
+		if (strcmp(substr, "#import") == 0) {
+			free(substr);
+			substr = get_substring(buffer, 7, strlen(buffer));
+			if (string_occurences(substr, '<') < 1 && string_occurences(substr, '>') < 1) {
+				free(substr);
+				substr = get_substring(buffer_copy, 7, strlen(buffer));
+				char *import_item = strdup(extract_delimited_string(trim(substr), '"'));
 				if (import_item && !string_isspace(import_item)) {
-					char *extension = get_substring(import_item, strlen(import_item) - 4, strlen(import_item) - 1, substring);
+					char *extension = get_substring(import_item, strlen(import_item) - 4, strlen(import_item));
 					if (strcmp(extension, ".ex4") == 0) {
-						char *ending_solved_import_item = replace_str_ending(import_item, ".mq4");
-
-						strcpy(import_items[line_num], ending_solved_import_item);
+						import_items->array[import_items->count++] = strdup(replace_str_ending(import_item, ".mq4"));
 					}
 					else if (strcmp(extension, ".mqh") == 0) {
 						if (!value_in_string_array(import_item, available_headers, *(&available_headers + 1) - available_headers)) {
@@ -52,11 +59,12 @@ int check_file_deps(char file[MAX_TOKEN_SIZE], char import_items[MAX_ARRAY_SIZE]
 						result = 400;
 						break;
 					}
+					free(extension);
 				}
 				free(import_item);
 			}
 			else {
-				char *import_item = rtrim_char(ltrim_char(trim(get_substring(buffer, 7, strlen(buffer) - 1, substring)), '<'), '>');
+				char *import_item = rtrim_char(ltrim_char(trim(get_substring(buffer, 7, strlen(buffer))), '<'), '>');
 				if (import_item && !string_isspace(import_item)) {
 					if (!value_in_string_array(import_item, available_headers, *(&available_headers + 1) - available_headers)) {
 						fprintf(stderr, "Err - unable to find .mqh header file '%s referenced in %s(line: %d)'\n", import_item, file, line_num);
@@ -64,9 +72,11 @@ int check_file_deps(char file[MAX_TOKEN_SIZE], char import_items[MAX_ARRAY_SIZE]
 						break;
 					}
 				}
+				free(import_item);
 			}
 		}
 		line_num++;
+		free(substr);
 		if (buffer_copy != NULL) {
 			free(buffer_copy);
 			buffer_copy = NULL;

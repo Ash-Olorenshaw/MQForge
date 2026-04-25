@@ -7,6 +7,7 @@
 #include <string.h>
 
 #include "../utils/string.h"
+#include "../array.h"
 #include "../globals.h"
 
 #ifdef _WIN32
@@ -14,7 +15,6 @@
 #else
 #include "../sys_interactions_linux.h"
 #endif
-
 
 int is_directory(const char *path) {
 	struct stat statbuf;
@@ -39,7 +39,7 @@ int convert_wine_path(char *path, char final_string[MAX_TOKEN_SIZE]) {
 	return 400;
 }
 
-void list_files(const char *basePath, char files[MAX_ARRAY_SIZE][MAX_TOKEN_SIZE], int *files_size, bool recurse) {
+void list_files(const char *basePath, array *files, bool recurse) {
 	char *path;
 	struct dirent *dp;
 	DIR *dir = opendir(basePath);
@@ -54,68 +54,73 @@ void list_files(const char *basePath, char files[MAX_ARRAY_SIZE][MAX_TOKEN_SIZE]
 			strcat(path, "/");
 			strcat(path, dp->d_name);
 
+			if (recurse)
+				list_files(path, files, true);
+
 			if (!is_directory(path)) {
-				if (*files_size < MAX_ARRAY_SIZE - 1) {
-					strcpy(files[(*files_size)++], path);
+				if (files->count < files->size - 1) {
+					if (files->array[files->count] == NULL)
+						files->array[files->count++] = strdup(path);
+					else
+						strcpy(files->array[files->count++], path);
 				}
 			}
-
-			if (recurse)
-				list_files(path, files, files_size, true);
 			free(path);
 		}
 	}
 	closedir(dir);
 }
 
-int search_dir_for_ext(const char *target_path, const char *extension, char files[MAX_ARRAY_SIZE][MAX_TOKEN_SIZE], bool recurse) {
-	char all_files[MAX_ARRAY_SIZE][MAX_TOKEN_SIZE] = {0};
-	int fileptr = 0;
+int search_dir_for_ext(const char *target_path, const char *extension, array *files, bool recurse) {
+	array *all_files = NEW_ARRAY(MAX_ARRAY_SIZE);
+	list_files(target_path, all_files, recurse);
 
-	list_files(target_path, all_files, &fileptr, recurse);
+	int i = 0;
+	char *elem;
+	ARRAY_FOREACH(elem, all_files, i) {
+		array *lines = NEW_ARRAY(MAX_ARRAY_SIZE);
 
-	int files_found = 0;
-
-	for (int i = 0; i < fileptr; i++) {
-		char lines[MAX_ARRAY_SIZE][MAX_TOKEN_SIZE] = {0};
-
-		int splits = split_string(all_files[i], '.', lines);
-		if (splits > 0 && files_found < MAX_ARRAY_SIZE) {
-			if (strcmp(lines[splits - 1], extension) == 0) {
-				strcpy(files[files_found++], all_files[i]);
-			}
+		int splits = split_string(elem, '.', lines);
+		if (splits > 0 && splits < MAX_ARRAY_SIZE) {
+			if (strcmp(lines->array[splits - 1], extension) == 0)
+				files->array[files->count++] = strdup(elem);
 		}
+		free_array(&lines);
 	}
 
-	return files_found;
+	free_array(&all_files);
+
+	return files->count;
 }
 
-int search_PATH_for_ext(const char *extension, char additional_dirs[MAX_ARRAY_SIZE][MAX_TOKEN_SIZE], char files[MAX_ARRAY_SIZE][MAX_TOKEN_SIZE]) {
-	int current_files_found = search_dir_for_ext(work_area, extension, files, false);
-	char path_dirs[MAX_ARRAY_SIZE][MAX_TOKEN_SIZE] = {0};
+void search_PATH_for_ext(const char *extension, array *additional_dirs, array **files) {
+	if (files == NULL)
+		return;
+
+	search_dir_for_ext(work_area, extension, *files, false);
+
+	array *path_dirs = NEW_ARRAY(MAX_ARRAY_SIZE);
 	get_PATH(path_dirs);
 
-	char all_dirs[MAX_ARRAY_SIZE * 2][MAX_TOKEN_SIZE] = {0};
-	int all_dirs_index = 0;
+	array *all_dirs = NEW_ARRAY(MAX_ARRAY_SIZE * 2);
 	for (int i = 0; i < MAX_ARRAY_SIZE; i++) {
-		if (path_dirs[i] != NULL && strcmp(path_dirs[i], "") != 0) {
-			strcpy(all_dirs[all_dirs_index++], path_dirs[i]);
-		}
+		if (i < path_dirs->count && strcmp(path_dirs->array[i], "") != 0)
+			all_dirs->array[all_dirs->count++] = strdup(path_dirs->array[i]);
 
-		if (additional_dirs[i] != NULL && strcmp(additional_dirs[i], "") != 0) {
-			strcpy(all_dirs[all_dirs_index++], additional_dirs[i]);
+		if (i < additional_dirs->count && strcmp(additional_dirs->array[i], "") != 0)
+			all_dirs->array[all_dirs->count++] = strdup(additional_dirs->array[i]);
+	}
+
+	for (int idir = 0; idir < all_dirs->count; idir++) {
+		array *new_dir_files = NEW_ARRAY(MAX_ARRAY_SIZE);
+		search_dir_for_ext(all_dirs->array[idir], extension, new_dir_files, false);
+
+		if (array_append(files, &new_dir_files) != 0) {
+			free_array(&new_dir_files);
+			break;
 		}
 	}
 
-	int insertion_ptr = current_files_found;
-	for (int idir = 0; idir < all_dirs_index + 1; idir++) {
-		char new_dir_files[MAX_ARRAY_SIZE][MAX_TOKEN_SIZE] = {0};
-		int new_files_found = search_dir_for_ext(all_dirs[idir], extension, files, false);
-		if (new_files_found + insertion_ptr < MAX_ARRAY_SIZE) {
-			memcpy(files + insertion_ptr, new_dir_files, new_files_found * sizeof(char *));
-			insertion_ptr += new_files_found;
-		}
-	}
-
-	return insertion_ptr;
+	free_array(&all_dirs);
+	free_array(&path_dirs);
 }

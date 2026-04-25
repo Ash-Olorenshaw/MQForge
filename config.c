@@ -77,6 +77,30 @@ void process_json_config() {
 	else if (cJSON_IsBool(use_PATH_json))
 		use_PATH = use_PATH_json->valueint;
 
+	cJSON *target_json = cJSON_GetObjectItemCaseSensitive(data_json, "target");
+	if (cJSON_IsString(target_json)) {
+		if (strcmp(target_json->valuestring, "*") == 0)
+			target_files = NULL;
+		else {
+			fprintf(stderr, "Err - JSON key \"target\" in '%s' should be either the string '*', a string array of files, or omitted entirely.", alt_settings_file);
+			exit(1);
+		}
+	}
+	else if (cJSON_IsArray(target_json)) {
+		cJSON *file_target;
+		target_files = NEW_ARRAY(cJSON_GetArraySize(target_json));
+
+		cJSON_ArrayForEach(file_target, target_json) {
+			if (cJSON_IsString(file_target))
+				target_files->array[target_files->count++] = strdup(file_target->valuestring);
+			else {
+				fprintf(stderr, "Err - JSON key \"target\" in '%s' should be either the string '*', a string array of files, or omitted entirely.", alt_settings_file);
+				exit(1);
+			}
+		}
+
+	}
+
 	cJSON_Delete(data_json);
 }
 
