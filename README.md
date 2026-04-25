@@ -95,7 +95,8 @@ if you want to make compiling easier if you're going to be compiling over and ov
 	"use_wine" : false,
 	"compiler_colours" : true,
 	"suppress_errors" : false,
-	"use_path" : true
+	"use_path" : true,
+	"target" : "*"
 }
 ```
 
@@ -103,6 +104,11 @@ With this file it makes it even easier. You can just run MQForge like this in yo
 ```nu-script
 MQForge
 ```
+
+The only additional parameter of note is `target` in `forge_commands.json`, which does not have a
+corresponding compile flag. This can either be a string `"*"` representing that you want all files
+compiled or you can provide an array of strings of the files that you want.
+
 ## Building
 
 Currently MQForge is only setup for building with Linux, however, you can still build on Windows with WSL.
