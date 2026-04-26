@@ -32,10 +32,9 @@ void process_core_flags(int argc, char *argv[]) {
 	}
 }
 
-void process_json_config() {
+void process_json_config(void) {
 	char buffer[MAX_JSON_FILE_SIZE];
 	FILE *file_ptr = fopen(alt_settings_file, "r");
-	char line_items[MAX_TOKEN_SIZE][MAX_JSON_KEYS];
 
 	if (file_ptr) {
 		fread(buffer, MAX_JSON_FILE_SIZE, 1, file_ptr);
@@ -119,7 +118,7 @@ void process_command_flags(int argc, char *argv[]) {
 			default_header_location = argv[arg_num + 1];
 
 		else if (check_arg_equals(argv[arg_num], "-wine", "--use-wine", NULL)) {
-			if (argc - 1 > arg_num && argv[arg_num + 1][0] == '-' || argc - 1 == arg_num) {
+			if ((argc - 1 > arg_num && argv[arg_num + 1][0] == '-') || argc - 1 == arg_num) {
 				use_wine = true;
 			}
 			else {
@@ -134,7 +133,7 @@ void process_command_flags(int argc, char *argv[]) {
 		}
 
 		else if (check_arg_equals(argv[arg_num], "-clr", "--colourful", NULL)) {
-			if (argc - 1 > arg_num && argv[arg_num + 1][0] == '-' || argc - 1 == arg_num) {
+			if ((argc - 1 > arg_num && argv[arg_num + 1][0] == '-') || argc - 1 == arg_num) {
 				colourful = true;
 			}
 			else {
@@ -149,7 +148,7 @@ void process_command_flags(int argc, char *argv[]) {
 		}
 
 		else if (check_arg_equals(argv[arg_num], "-se", "--suppress-errors", NULL)) {
-			if (argc - 1 > arg_num && argv[arg_num + 1][0] == '-' || argc - 1 == arg_num) {
+			if ((argc - 1 > arg_num && argv[arg_num + 1][0] == '-') || argc - 1 == arg_num) {
 				suppress_launch_errors = true;
 			}
 			else {
@@ -164,7 +163,7 @@ void process_command_flags(int argc, char *argv[]) {
 		}
 
 		else if (check_arg_equals(argv[arg_num], "-path", "--use-path", NULL)) {
-			if (argc - 1 > arg_num && argv[arg_num + 1][0] == '-' || argc - 1 == arg_num) {
+			if ((argc - 1 > arg_num && argv[arg_num + 1][0] == '-') || argc - 1 == arg_num) {
 				use_PATH = true;
 			}
 			else {

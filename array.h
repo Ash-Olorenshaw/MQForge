@@ -3,8 +3,6 @@
 
 #include <stddef.h>
 
-// #define ARRAY_FOREACH(elem, target, i)  \
-// 	for (elem = (target != NULL) ? (target)->array[i++] : NULL; i < (target)->count && elem != NULL; elem = (target)->array[i++])
 #define ARRAY_FOREACH(elem, target, i) \
     for (i = 0; (target) != NULL && i < (target)->count && ((elem) = (target)->array[i]) != NULL; i++)
 

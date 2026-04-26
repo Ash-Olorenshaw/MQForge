@@ -109,13 +109,16 @@ The only additional parameter of note is `target` in `forge_commands.json`, whic
 corresponding compile flag. This can either be a string `"*"` representing that you want all files
 compiled or you can provide an array of strings of the files that you want.
 
+The `target` parameter will spider out and find dependencies of the file you are compiling, so you
+do not need to specify them all in the array.
+
 ## Building
 
 Currently MQForge is only setup for building with Linux, however, you can still build on Windows with WSL.
 
-MQForge works using `i686-w64-mingw32` for building for Windows and `gcc` for Linux.
-
-To build, follow the following:
+The main reason for this is that building relies on Bash and GNU C extensions in the codebase. This
+means that generally you'll want to use the `mingw` version of `gcc` to compile as opposed to
+`msvc`. I used to `CMake`, but I just vastly prefer writing my compiliation scripts in C.
 
 ```nu-script
 # clone this repo
@@ -123,22 +126,40 @@ git clone https://github.com/Ash-Olorenshaw/MQForge.git
 
 # cd into dir
 cd MQForge
+```
 
-# building for Linux:
-cmake -DTARGET_PLATFORM=Linux -B build -S .
+If you are using a Posix shell (Bash, Dash, Zsh, etc) then just do the following
+```nu-script
+# make script executable
+chmod +x ./compile.c
 
-# building for Windows:
-cmake -DTARGET_PLATFORM=Windows -B build -S .
+# run
+./compile.c [COMPILER]
+```
+There are also two optional flags that can be passed to `./compile.c`: `run` and `debug`.
 
-# cd into build directory
-cd build
+If you aren't using a Posix compliant shell (Pwsh, Fish, NuShell) you can either do:
+```
+bash ./runbench.c [COMPILER]
+```
 
-# make the project
-make
+Or the following:
+
+```nu-script
+# gcc is not necessary, just for example
+# compile
+gcc "$0" \
+	./build_scripts/utils.c ./build_scripts/args.c \
+	-o ./compile
+
+# make executable
+chmod +x ./compile
+
+# run
+./compile [COMPILER]
 ```
 
 After these steps, you should either have a `MQForge` or `MQForge.exe` file in the build directory for your use!
-
 
 ## Credits
 

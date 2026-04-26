@@ -33,7 +33,7 @@ int convert_wine_path(char *path, char final_string[MAX_TOKEN_SIZE]) {
 		char *temp_path = strdup(path);
 		strcpy(final_string, "C:");
 		temp_path = split_get_second_half(temp_path, "drive_c");
-		strncat(final_string, temp_path, MAX_TOKEN_SIZE);
+		strncat(final_string, temp_path, MAX_TOKEN_SIZE - strlen(final_string));
 		return 200;
 	}
 	return 400;

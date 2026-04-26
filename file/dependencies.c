@@ -23,10 +23,10 @@ int get_dep_dict_size() {
 void print_deps(map_element_array dependency_dict[MAX_ARRAY_SIZE]) {
 	printf("{\n");
 	for (int i = 0; i < MAX_ARRAY_SIZE; i++) {
-		if (dependency_dict[i].key != NULL) {
+		if (dependency_dict[i].key != NULL && strcmp(dependency_dict[i].key, "") != 0) {
 			printf("\t\"%s\" : [", dependency_dict[i].key);
 			for (int j = 0; j < MAX_ARRAY_SIZE; j++) {
-				if (strcmp(dependency_dict[i].val[j], "") != 0 && dependency_dict[i].val[j] != NULL) {
+				if (strcmp(dependency_dict[i].val[j], "") != 0) {
 					printf("\"%s\", ", dependency_dict[i].val[j]);
 				}
 			}
@@ -83,10 +83,10 @@ void change_deps_extensions(array *dependencies) {
 
 int get_dep_dict_item_by_key(char *key, array *item) {
 	for (int i = 0; i < MAX_ARRAY_SIZE; i++) {
-		if (dependency_dict[i].key != NULL && strcmp(dependency_dict[i].key, "") != 0) {
+		if (strcmp(dependency_dict[i].key, "") != 0) {
 			if (strcmp(dependency_dict[i].key, key) == 0) {
 				for (int j = 0; j < MAX_ARRAY_SIZE; j++) {
-					if (dependency_dict[i].val[j] != NULL && !string_isspace(dependency_dict[i].val[j]))
+					if (!string_isspace(dependency_dict[i].val[j]))
 						item->array[item->count++] = strdup(dependency_dict[i].val[j]);
 				}
 				return 200;
@@ -98,13 +98,12 @@ int get_dep_dict_item_by_key(char *key, array *item) {
 
 int delete_dep_dict_item_by_key(char *key) {
 	for (int i = 0; i < MAX_ARRAY_SIZE; i++) {
-		if (dependency_dict[i].key != NULL && strcmp(dependency_dict[i].key, "") != 0) {
+		if (strcmp(dependency_dict[i].key, "") != 0) {
 			if (strcmp(dependency_dict[i].key, key) == 0) {
-				dependency_dict[i].key = NULL;
+				dependency_dict[i].key = "";
 				for (int j = 0; j < MAX_ARRAY_SIZE; j++) {
-					if (dependency_dict[i].val[j] != NULL && strcmp(dependency_dict[i].val[j], "") != 0) {
+					if (strcmp(dependency_dict[i].val[j], "") != 0)
 						strcpy(dependency_dict[i].val[j], "");
-					}
 				}
 
 				return 200;

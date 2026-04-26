@@ -7,11 +7,11 @@
 
 bool running = false;
 
-void spinner_stop() {
+void spinner_stop(void) {
 	running = false;
 }
 
-void* spinner_thread(void* arg) {
+void* spinner_thread(void) {
 	running = true;
 	int state = 0;
 
@@ -61,7 +61,7 @@ void* spinner_thread(void* arg) {
     return NULL;
 }
 
-void print_run_info() {
+void print_run_info(void) {
 	printf("Starting compile in %s with:\n", work_area);
 	printf("\t- meta_editor = '%s'\n", meta_editor);
 	printf("\t- default_header_location = '%s'\n", default_header_location);

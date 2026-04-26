@@ -15,7 +15,7 @@ char *string_lower(char *str) {
 }
 
 bool string_isspace(char *str) {
-	for (int i = 0; i < strlen(str); i++) {
+	for (int i = 0; i < (int) strlen(str); i++) {
 		if (!isspace(str[i]))
 			return false;
 	}
@@ -23,7 +23,7 @@ bool string_isspace(char *str) {
 }
 
 char *replace_str_ending(char *str, char *replacement_str) {
-	for (int i = 0; i < strlen(replacement_str); i++) {
+	for (int i = 0; i < (int) strlen(replacement_str); i++) {
 		str[strlen(str) - 1 - i] = replacement_str[strlen(replacement_str) - 1 - i];
 	}
 	return str;

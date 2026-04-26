@@ -8,6 +8,7 @@
 
 #include "utils/string.h"
 #include "file/utils.h"
+#include "compiler.h"
 
 #define BOM_UTF16_LE 0xFFFE
 #define BOM_UTF16_BE 0xFEFF
@@ -96,7 +97,8 @@ char *get_file_line(char *file, int iLine, char final_line[MAX_TOKEN_SIZE]) {
 }
 
 
-char *generate_error_indicator(char *original_text, char *result) {
+// Assumes 'result' to be an unallocated buffer
+char *generate_error_indicator(char *original_text, char **result) {
 	char *text = strdup(original_text);
 	char *relevant_identifier = "";
 	if (strstr(text, ") : error"))
@@ -148,83 +150,93 @@ char *generate_error_indicator(char *original_text, char *result) {
 
 	whitespace[++whitespace_index] = '\n';
 	whitespace[++whitespace_index] = '\0';
-	snprintf(result, MAX_TOKEN_SIZE, "\n%s: %s\n%s", line_string, trim(target_line), whitespace);
+	int result_size = strlen("\n: \n") + strlen(line_string) + strlen(trim(target_line)) + strlen(whitespace);
+
+	if (*result == NULL)
+		free(*result);
+
+	*result = malloc(result_size + sizeof(char));
+	snprintf(*result, result_size, "\n%s: %s\n%s", line_string, trim(target_line), whitespace);
 
 	free_array(&tokens_out);
 	free(text);
 	free(line_string);
-	return result;
+	return *result;
 }
 
-char *colour_compiler_text(char *text, char *colour, char final_string[MAX_TOKEN_SIZE]) {
-	char error_text[MAX_TOKEN_SIZE];
-	if (colour == NULL) {
-		if (colourful == true) {
-			if (strstr(text, ": information") != NULL) {
-				snprintf(final_string, MAX_TOKEN_SIZE, "\x1B[36m%s%s\x1B[0m", text, generate_error_indicator(text, error_text));
-				return final_string;
+char *colour_compiler_text(char *text, PRINT_COLOR colour, char final_string[MAX_TOKEN_SIZE]) {
+	char *error_text = NULL;
+	switch (colour) {
+		case NONE:
+			if (colourful == true) {
+				if (strstr(text, ": information") != NULL) {
+					snprintf(final_string, MAX_TOKEN_SIZE, "\x1B[36m%s%s\x1B[0m", text, generate_error_indicator(text, &error_text));
+					goto exit;
+				}
+				else if (strstr(text, ": error") != NULL) {
+					snprintf(final_string, MAX_TOKEN_SIZE, "\x1B[31m%s%s\x1B[0m", text, generate_error_indicator(text, &error_text));
+					goto exit;
+				}
+				else if (strstr(text, ": warning") != NULL) {
+					snprintf(final_string, MAX_TOKEN_SIZE, "\x1B[33m%s%s\x1B[0m", text, generate_error_indicator(text, &error_text));
+					goto exit;
+				}
+				else if (strstr(text, "Result:") != NULL) {
+					snprintf(final_string, MAX_TOKEN_SIZE, "\x1B[32m%s%s\x1B[0m", text, generate_error_indicator(text, &error_text));
+					goto exit;
+				}
 			}
-			else if (strstr(text, ": error") != NULL) {
-				snprintf(final_string, MAX_TOKEN_SIZE, "\x1B[31m%s%s\x1B[0m", text, generate_error_indicator(text, error_text));
-				return final_string;
+			else {
+				snprintf(final_string, MAX_TOKEN_SIZE, "%s%s", text, generate_error_indicator(text, &error_text));
+				goto exit;
 			}
-			else if (strstr(text, ": warning") != NULL) {
-				snprintf(final_string, MAX_TOKEN_SIZE, "\x1B[33m%s%s\x1B[0m", text, generate_error_indicator(text, error_text));
-				return final_string;
-			}
-			else if (strstr(text, "Result:") != NULL) {
-				snprintf(final_string, MAX_TOKEN_SIZE, "\x1B[32m%s%s\x1B[0m", text, generate_error_indicator(text, error_text));
-				return final_string;
-			}
-		}
-		else {
-			snprintf(final_string, MAX_TOKEN_SIZE, "%s%s", text, generate_error_indicator(text, error_text));
-			return final_string;
-		}
-	}
-	else {
-		if (strcmp(colour, "red") == 0) {
+			break;
+		case RED:
 			snprintf(final_string, MAX_TOKEN_SIZE, "\x1B[31m%s\x1B[0m", text);
-			return final_string;
-		}
-		else if (strcmp(colour, "orange") == 0) {
+			goto exit;
+		case ORANGE:
 			snprintf(final_string, MAX_TOKEN_SIZE, "\x1B[33m%s\x1B[0m", text);
-			return final_string;
-		}
-		else if (strcmp(colour, "cyan") == 0) {
+			goto exit;
+		case CYAN:
 			snprintf(final_string, MAX_TOKEN_SIZE, "\x1B[36m%s\x1B[0m", text);
-			return final_string;
-		}
-		else if (strcmp(colour, "green") == 0) {
+			goto exit;
+		case GREEN:
 			snprintf(final_string, MAX_TOKEN_SIZE, "\x1B[32m%s\x1B[0m", text);
-			return final_string;
-		}
+			goto exit;
 	}
 
 	strcpy(final_string, text);
-	return final_string;
+
+	exit:
+		if (error_text != NULL)
+			free(error_text);
+		return final_string;
 }
 
 
 int compile_file(char target_file[MAX_TOKEN_SIZE]) {
-	char popen_command[MAX_TOKEN_SIZE];
+	char *popen_command;
 	FILE *proc;
 	char final_response[MAX_TOKEN_SIZE * 10] = "";
 
 	if (use_wine) {
 		char new_file[MAX_TOKEN_SIZE];
 		int conversion_success = convert_wine_path(target_file, new_file);
-		if (conversion_success == 400) {
+		if (conversion_success == 400)
 			strcpy(new_file, target_file);
-		}
-		snprintf(popen_command, MAX_TOKEN_SIZE, "wine \"%s\" /compile:\"%s\" /log:errors.log 2>&1", meta_editor, new_file);
+		int command_size = strlen("wine \"\" /compile:\"\" /log:errors.log 2>&1") + strlen(meta_editor) + strlen(new_file) + 1;
+		popen_command = malloc(command_size * sizeof(char));
+		snprintf(popen_command, command_size, "wine \"%s\" /compile:\"%s\" /log:errors.log 2>&1", meta_editor, new_file);
 		proc = popen(popen_command, "r");
 	}
 	else {
-		snprintf(popen_command, MAX_TOKEN_SIZE, "\"\"%s\" /compile:\"%s\" /log:errors.log 2>&1\"", meta_editor, target_file);
+		int command_size = strlen("\"\"\" /compile:\"\" /log:errors.log 2>&1\"") + strlen(meta_editor) + strlen(target_file) + 1;
+		popen_command = malloc(command_size * sizeof(char));
+		snprintf(popen_command, command_size, "\"\"%s\" /compile:\"%s\" /log:errors.log 2>&1\"", meta_editor, target_file);
 		proc = popen(popen_command, "r");
 	}
 	printf("Compiling file '%s' with '%s'\n", target_file, popen_command);
+	free(popen_command);
 
 	char ch;
 	while((ch = fgetc(proc)) != EOF) {
@@ -237,7 +249,7 @@ int compile_file(char target_file[MAX_TOKEN_SIZE]) {
 
 	if (proc && !suppress_launch_errors) {
 		char coloured_text[MAX_TOKEN_SIZE];
-		printf("%s\n", colour_compiler_text("\nmetaeditor.exe errors:", "red", coloured_text));
+		printf("%s\n", colour_compiler_text("\nmetaeditor.exe errors:", RED, coloured_text));
 		printf("%s\n", final_response);
 	}
 
@@ -250,7 +262,7 @@ int compile_file(char target_file[MAX_TOKEN_SIZE]) {
 	for (int i = 1; i < lines_len; i++) {
 		if (!string_isspace(lines->array[i])) {
 			char final_line[MAX_TOKEN_SIZE];
-			printf("%s\n", colour_compiler_text(trim(lines->array[i]), NULL, final_line));
+			printf("%s\n", colour_compiler_text(trim(lines->array[i]), NONE, final_line));
 		}
 	}
 

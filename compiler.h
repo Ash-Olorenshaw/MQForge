@@ -3,6 +3,14 @@
 
 #include "array.h"
 
-int compile_files(array *target_files);
+typedef enum {
+	NONE,
+	RED,
+	ORANGE,
+	CYAN,
+	GREEN,
+} PRINT_COLOR;
+
+void compile_files(array *target_files);
 
 #endif

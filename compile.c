@@ -3,8 +3,7 @@
     gcc "$0" \
 		./build_scripts/utils.c ./build_scripts/args.c \
 		-o ./.temp-run \
-		-Wall -Wextra -pedantic \
-		-g -fsanitize=address -fno-omit-frame-pointer
+		-Wall -Wextra -Wno-gnu -pedantic
 	printf "\n"
 	./.temp-run "$@"
     rm -f ./.temp-run
@@ -40,13 +39,21 @@ int main(int argv, const char **argc) {
 	args arguments = { .arg_count = argv, .args = argc };
 	char *output_file_name = arg_pos("windows", arguments) == -1 ? OUTPUT_FILE : (OUTPUT_FILE".exe");
 
+	char *compiler;
+	if (argv < 2 || strcmp(argc[1], "-") == 0) {
+		printf("No compiler provided, defaulting to `gcc`\n");
+		compiler = "gcc";
+	}
+	else
+		compiler = (char *) argc[1];
+
 	char** debug_args = (char**) ARR_CREATE("-g", "-fsanitize=address", "-fno-omit-frame-pointer" );
 	char **build_args = (char**) ARR_CREATE(
-		arg_pos("windows", arguments) == -1 ? "gcc" : "x86_64-w64-mingw32-gcc",
+		compiler,
 		BUILD_FILES,
+		BUILD_ARGS,
 		"-o",
-		output_file_name,
-		BUILD_ARGS
+		output_file_name
 	);
 
 	if (arg_pos("debug", arguments) != -1) {
