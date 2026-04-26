@@ -1,6 +1,6 @@
 # MQForge
 **MetaQuotes Forge**
-alpha v0.0.1
+beta v0.0.2
 
 A tool for making compiling MetaQuotes files from the commandline using the MetaQuotes compiler `Meta Editor` easier!
 
@@ -118,7 +118,7 @@ Currently MQForge is only setup for building with Linux, however, you can still 
 
 The main reason for this is that building relies on Bash and GNU C extensions in the codebase. This
 means that generally you'll want to use the `mingw` version of `gcc` to compile as opposed to
-`msvc`. I used to `CMake`, but I just vastly prefer writing my compiliation scripts in C.
+`msvc`. I used to use `CMake`, but I just vastly prefer writing my compiliation scripts in C.
 
 ```nu-script
 # clone this repo
@@ -139,7 +139,7 @@ chmod +x ./compile.c
 There are also two optional flags that can be passed to `./compile.c`: `run` and `debug`.
 
 If you aren't using a Posix compliant shell (Pwsh, Fish, NuShell) you can either do:
-```
+```nu-script
 bash ./runbench.c [COMPILER]
 ```
 
@@ -148,9 +148,7 @@ Or the following:
 ```nu-script
 # gcc is not necessary, just for example
 # compile
-gcc "$0" \
-	./build_scripts/utils.c ./build_scripts/args.c \
-	-o ./compile
+gcc ./build_scripts/utils.c ./build_scripts/args.c -o ./compile
 
 # make executable
 chmod +x ./compile
